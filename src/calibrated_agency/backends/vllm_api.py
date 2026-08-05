@@ -230,6 +230,7 @@ class VllmApiBackend:
         payload.update(
             {
                 "temperature": 1.0,
+                "top_p": 1.0,
                 "max_tokens": 1,
                 "logprobs": True,
                 "logprob_token_ids": list(token_ids.values()),

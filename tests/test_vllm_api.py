@@ -92,6 +92,7 @@ def test_vllm_api_scores_explicit_boundary_token_ids() -> None:
     assert chat_payload["logprob_token_ids"] == [10, 11]
     assert chat_payload["max_tokens"] == 1
     assert chat_payload["temperature"] == 1.0
+    assert chat_payload["top_p"] == 1.0
 
 
 def test_vllm_api_rejects_label_that_is_not_appended_at_boundary() -> None:

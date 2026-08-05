@@ -20,7 +20,8 @@ isolation is not sufficient: byte-pair tokenization can merge across the prefix 
 Supported deployment profile:
 
 - vLLM `0.26.*`;
-- server started with `--logprobs-mode raw_logprobs` (recommended) or `raw_logits`;
+- server started with `--logprobs-mode raw_logprobs` (recommended) or `raw_logits`,
+  plus `--generation-config vllm` to avoid inherited model-card sampling filters;
 - no speculative decoding;
 - no penalties, top-k, top-p, or logit bias in the score request;
 - at most 128 candidate token IDs.

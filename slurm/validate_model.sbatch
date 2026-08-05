@@ -74,6 +74,7 @@ CUDA_VISIBLE_DEVICES=0 run_container \
     --dtype bfloat16 \
     --max-model-len 4096 \
     --gpu-memory-utilization 0.88 \
+    --generation-config vllm \
     --logprobs-mode raw_logprobs \
     >"${RESULTS}/server.log" 2>&1 &
 SERVER_PID=$!

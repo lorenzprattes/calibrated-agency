@@ -96,7 +96,7 @@ The vLLM API fast path requires each action label to be a distinct single token 
 Run the server with an explicit score mode:
 
 ```bash
-vllm serve MODEL --logprobs-mode raw_logprobs
+vllm serve MODEL --logprobs-mode raw_logprobs --generation-config vllm
 ```
 
 The adapter generates one constrained token, retrieves every requested candidate score by

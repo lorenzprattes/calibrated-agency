@@ -249,6 +249,8 @@ class TransformersNativeBackend:
             "pad_token_id": self.tokenizer.eos_token_id,
             "return_dict_in_generate": True,
             "output_scores": True,
+            # Do not inherit model-card truncation defaults for the categorical action.
+            "top_p": 1.0,
         }
         if temperature > 0:
             generation_kwargs.update({"do_sample": True, "temperature": temperature})
