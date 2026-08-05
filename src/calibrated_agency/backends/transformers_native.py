@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import math
-import threading
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
@@ -35,42 +34,6 @@ class TransformersDecision:
     raw_scores: Mapping[str, float]
     expected_probabilities: Mapping[str, float]
     sampled_probabilities: Mapping[str, float]
-
-
-def _neutral_generation_config_kwargs(
-    *,
-    eos_token_id: int | list[int] | None,
-    bos_token_id: int | None,
-    temperature: float,
-) -> dict[str, Any]:
-    """Return an action-only config that does not inherit model-card score transforms."""
-    return {
-        "max_new_tokens": 1,
-        "do_sample": temperature > 0,
-        "temperature": temperature if temperature > 0 else None,
-        "top_k": None,
-        "top_p": None,
-        "min_p": None,
-        "typical_p": None,
-        "epsilon_cutoff": None,
-        "eta_cutoff": None,
-        "repetition_penalty": 1.0,
-        "encoder_repetition_penalty": 1.0,
-        "no_repeat_ngram_size": 0,
-        "diversity_penalty": 0.0,
-        "sequence_bias": None,
-        "bad_words_ids": None,
-        "suppress_tokens": None,
-        "begin_suppress_tokens": None,
-        "forced_bos_token_id": None,
-        "forced_eos_token_id": None,
-        "watermarking_config": None,
-        "renormalize_logits": False,
-        "pad_token_id": eos_token_id,
-        "eos_token_id": eos_token_id,
-        "bos_token_id": bos_token_id,
-        "use_cache": True,
-    }
 
 
 class FirstTokenBayesianLogitsProcessor(LogitsProcessor):
@@ -157,7 +120,7 @@ class TransformersNativeBackend:
         model_id: str | None = None,
         chat_template_kwargs: Mapping[str, Any] | None = None,
     ) -> None:
-        if not callable(model) or not hasattr(model, "generate"):
+        if not callable(model) or not hasattr(model, "get_input_embeddings"):
             raise TypeError("model must be a Transformers-compatible causal language model")
         if not hasattr(tokenizer, "apply_chat_template"):
             raise TypeError("tokenizer must provide apply_chat_template")
@@ -165,7 +128,6 @@ class TransformersNativeBackend:
         self.tokenizer = tokenizer
         self.model_id = model_id or str(getattr(model, "name_or_path", "unknown"))
         self.chat_template_kwargs = dict(chat_template_kwargs or {})
-        self._generation_lock = threading.Lock()
 
     @staticmethod
     def _messages(
@@ -250,7 +212,10 @@ class TransformersNativeBackend:
         input_ids = self._input_tensor(base_ids)
         self.model.eval()
         with torch.inference_mode():
-            output = self.model(input_ids=input_ids)
+            output = self.model(
+                input_ids=input_ids,
+                attention_mask=torch.ones_like(input_ids),
+            )
         next_logits = output.logits[0, -1]
         raw_scores = {
             action: float(next_logits[token_id].item())
@@ -273,7 +238,7 @@ class TransformersNativeBackend:
         beta: float,
         temperature: float = 1.0,
     ) -> TransformersDecision:
-        """Sample one corrected action through ``model.generate`` and the native processor."""
+        """Apply the native processor to one forward pass and sample with a local RNG."""
         base_ids, action_token_ids = self.resolve_token_ids(request)
         input_ids = self._input_tensor(base_ids)
         processor = FirstTokenBayesianLogitsProcessor(
@@ -284,43 +249,35 @@ class TransformersNativeBackend:
             beta=beta,
             sampling_temperature=temperature,
         )
-        from transformers import GenerationConfig
-
-        generation_config = GenerationConfig(
-            **_neutral_generation_config_kwargs(
-                eos_token_id=self.tokenizer.eos_token_id,
-                bos_token_id=getattr(self.tokenizer, "bos_token_id", None),
-                temperature=temperature,
+        self.model.eval()
+        with torch.inference_mode():
+            output = self.model(
+                input_ids=input_ids,
+                attention_mask=torch.ones_like(input_ids),
             )
+        processed_scores = processor(input_ids, output.logits[:, -1, :])
+        sampling_scores = (
+            processed_scores / temperature if temperature > 0 else processed_scores
         )
-        generation_kwargs: dict[str, Any] = {
-            "input_ids": input_ids,
-            "attention_mask": torch.ones_like(input_ids),
-            "generation_config": generation_config,
-            "logits_processor": [processor],
-            "return_dict_in_generate": True,
-            "output_scores": True,
-        }
-        cuda_devices = (
-            [input_ids.device.index]
-            if input_ids.device.type == "cuda" and input_ids.device.index is not None
-            else []
-        )
-        with self._generation_lock, torch.random.fork_rng(devices=cuda_devices):
-            torch.manual_seed(request.seed)
-            self.model.eval()
-            with torch.inference_mode():
-                generated = self.model.generate(**generation_kwargs)
-        token_id = int(generated.sequences[0, -1].item())
+        if temperature > 0:
+            generator = torch.Generator(device=input_ids.device).manual_seed(request.seed)
+            token_id = int(
+                torch.multinomial(
+                    torch.softmax(sampling_scores[0].float(), dim=-1),
+                    num_samples=1,
+                    generator=generator,
+                ).item()
+            )
+        else:
+            token_id = int(torch.argmax(sampling_scores[0]).item())
         actions_by_token_id = {value: action for action, value in action_token_ids.items()}
         if token_id not in actions_by_token_id:
             raise RuntimeError("native processor generated a token outside the action set")
         if processor.last_raw_scores is None:
             raise RuntimeError("Transformers did not invoke the action logits processor")
         corrected = bayesian_correct(processor.last_raw_scores, prior, target, beta)
-        first_scores = generated.scores[0][0]
         backend_scores = {
-            action: float(first_scores[candidate_id].item())
+            action: float(sampling_scores[0, candidate_id].item())
             for action, candidate_id in action_token_ids.items()
         }
         return TransformersDecision(

@@ -89,12 +89,17 @@ when intentionally reproducing an implementation that did not account for proces
 `TransformersNativeBackend.score` renders the chat template and executes a direct forward
 pass. This is the simplest way to obtain raw next-token logits.
 
-`FirstTokenBayesianLogitsProcessor` provides a native `model.generate` path. It records the
-initial prompt width, applies the correction only at that first generated position, masks
-other tokens, and compensates for the later Transformers temperature warper.
+`FirstTokenBayesianLogitsProcessor` records the initial prompt width, applies the correction
+only at that first generated position, masks other tokens, and can compensate for a later
+Transformers temperature warper. `TransformersNativeBackend.decide_native` invokes it on a
+single direct forward pass, applies the declared temperature, and samples with a local
+`torch.Generator`. This deliberately bypasses checkpoint `generation_config` penalties and
+truncation filters.
 
-The first release does not support beams, per-row action sets, padded heterogeneous prompt
-lengths, or speculative decoding. Fail rather than silently using these unsupported modes.
+The processor can be passed to `model.generate`, but callers then own the full generation
+configuration and must neutralize all inherited penalties, biases, forced/suppressed tokens,
+and truncation warpers. The first release does not support beams, per-row action sets, padded
+heterogeneous prompt lengths, or speculative decoding.
 
 ## Multi-token labels
 

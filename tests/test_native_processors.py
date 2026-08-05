@@ -6,10 +6,7 @@ from typing import Any
 
 import pytest
 
-from calibrated_agency.backends.transformers_native import (
-    FirstTokenBayesianLogitsProcessor,
-    _neutral_generation_config_kwargs,
-)
+from calibrated_agency.backends.transformers_native import FirstTokenBayesianLogitsProcessor
 from calibrated_agency.backends.vllm_native import (
     VLLM_EXTRA_KEY,
     BayesianActionLogitsProcessor,
@@ -231,19 +228,6 @@ def test_vllm_processor_greedy_temperature_does_not_zero_corrected_logits() -> N
     logits = FakeTensor([[2.0, 1.0]])
     processor.apply(logits)  # type: ignore[arg-type]
     assert logits.rows[0].values == pytest.approx([math.log(0.25), math.log(0.75)])
-
-
-def test_transformers_action_config_neutralizes_inherited_transforms() -> None:
-    config = _neutral_generation_config_kwargs(
-        eos_token_id=[8, 9], bos_token_id=1, temperature=0.7
-    )
-    assert config["temperature"] == 0.7
-    assert config["top_k"] is None and config["top_p"] is None
-    assert config["repetition_penalty"] == 1.0
-    assert config["sequence_bias"] is None
-    assert config["bad_words_ids"] is None
-    assert config["forced_eos_token_id"] is None
-    assert config["eos_token_id"] == [8, 9]
 
 
 def test_transformers_processor_validates_configuration_without_optional_runtime() -> None:
