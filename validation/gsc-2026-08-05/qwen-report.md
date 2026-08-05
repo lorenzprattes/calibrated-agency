@@ -14,7 +14,11 @@ Model: `Qwen/Qwen3.5-4B`
 | Backend | Decisions | Max expected/reported error | β=0 target error | Pass |
 |---|---:|---:|---:|:---:|
 | vllm-native | 24 | 2.14923e-07 | 2.44513e-08 | yes |
-| transformers | 24 | 5.24373e-07 | 2.44513e-08 | yes |
+| transformers | 24 | 5.01227e-07 | 2.44513e-08 | yes |
+
+## Batch-shape diagnostic
+
+Sequential-vs-batched max log-odds error: `0.125`
 
 Required implementation checks pass: **True**
 

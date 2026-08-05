@@ -1,14 +1,15 @@
-# GSC A100 live validation — 2026-08-05
+# GSC A100 live validation — 2026-08-05/06
 
-Repository commit: `c2fbe2a`  
+Validated implementation commit: `4685fdea263ac6120e43c5fc302ea95a0c11ff9d`
+
 Runtime: vLLM 0.26.0, Transformers 5.14.1, PyTorch 2.11.0+cu130  
 Hardware: two NVIDIA A100-PCIE-40GB GPUs, driver 580.65.06  
 Execution: bfloat16; vLLM eager mode; synthetic prompts only
 
 | Model | Immutable model revision | Slurm job |
 |---|---|---:|
-| Qwen/Qwen3.5-4B | `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a` | 5563540 |
-| unsloth/Llama-3.1-8B-Instruct | `4699cc75b550f9c6f3173fb80f4703b62d946aa5` | 5563568 |
+| Qwen/Qwen3.5-4B | `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a` | 5564059 |
+| unsloth/Llama-3.1-8B-Instruct | `4699cc75b550f9c6f3173fb80f4703b62d946aa5` | 5564078 |
 
 ## Main result
 
@@ -56,12 +57,17 @@ At beta 0.15, cross-runtime maximum corrected-probability differences were much 
 0.0041 for Qwen and 0.0064 for Llama. The strict report includes beta 1, where runtime score
 differences pass through unattenuated.
 
-## Diagnostic findings retained from development
+## Batch-shape and development diagnostics
+
+The final eager runs also compared sequential native scoring with one eight-request scheduler
+batch. Maximum log-odds drift was 0.125 for both models. This does not change the sequential
+API/native parity result, but it means priors and decisions should use the same batching
+profile when tight numerical reproduction matters.
 
 - vLLM's batch-invariance mode cannot run Qwen3.5's GDN attention in vLLM 0.26.
-- A non-eager Qwen run produced a 0.125 API/native log-odds discrepancy across independent
-  engine processes. Eager execution reduced it below 3.3e-7. This is why execution mode is
-  part of provenance and why the supplied validation script uses eager mode.
+- A non-eager Qwen run produced a 0.125 sequential API/native log-odds discrepancy across
+  independent engine processes. Matched eager sequential execution reduced it below 3.3e-7;
+  eager mode did not eliminate the separate sequential-versus-batch drift.
 - The Llama checkpoint's generation config supplied temperature 0.6 and top-p 0.9. The final
   deployment uses `--generation-config vllm`, and both API and Transformers action requests
   explicitly neutralize inherited truncation filters.

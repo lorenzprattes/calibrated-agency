@@ -42,12 +42,18 @@
       "backend": "transformers",
       "decisions": 24,
       "missing_backend_reported": 0,
-      "max_expected_vs_backend_probability_error": 5.243732575932469e-07,
+      "max_expected_vs_backend_probability_error": 5.012273305293746e-07,
       "beta_zero_max_target_error": 2.4451346170017985e-08,
       "tolerance": 1e-05,
       "passed": true
     }
   ],
+  "batch_diagnostic": {
+    "backend": "vllm-native",
+    "contexts": 8,
+    "max_sequential_vs_batch_log_odds_error": 0.1250000298023224,
+    "mean_sequential_vs_batch_log_odds_error": 0.0312500037252903
+  },
   "cross_runtime_diagnostic_passed": false,
   "passed": true
 }

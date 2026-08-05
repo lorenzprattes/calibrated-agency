@@ -16,6 +16,10 @@ Model: `unsloth/Llama-3.1-8B-Instruct`
 | vllm-native | 24 | 2.616e-07 | 2.44513e-08 | yes |
 | transformers | 24 | 3.48263e-07 | 2.44513e-08 | yes |
 
+## Batch-shape diagnostic
+
+Sequential-vs-batched max log-odds error: `0.125`
+
 Required implementation checks pass: **True**
 
 Cross-runtime vLLM/Transformers diagnostic passes its strict tolerance: **False**
