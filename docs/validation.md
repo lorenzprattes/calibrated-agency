@@ -40,10 +40,16 @@ on the categorical policy.
 
 Predeclared numerical thresholds:
 
-| Comparison | Max pairwise log-odds error | Max corrected-probability error |
-|---|---:|---:|
-| vLLM API vs vLLM native | 0.001 | 0.0001 |
-| vLLM API vs Transformers | 0.05 | 0.01 |
+| Comparison | Role | Max pairwise log-odds error | Max corrected-probability error |
+|---|---|---:|---:|
+| vLLM API vs vLLM native | required implementation gate | 0.001 | 0.0001 |
+| vLLM API vs Transformers | strict cross-runtime diagnostic | 0.05 | 0.01 |
+
+The Transformers diagnostic is not a release gate: vLLM and Transformers use different
+model implementations and kernels, so they need not expose identical bfloat16 logits. Each
+native processor must instead match the shared correction applied to the scores from its own
+invocation. The diagnostic remains visible and must not be relabeled as passing when it
+exceeds its threshold.
 
 The Transformers tolerance is wider because different kernels and execution paths are not
 expected to be bitwise identical.

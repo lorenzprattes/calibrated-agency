@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import math
+import threading
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
@@ -18,7 +19,9 @@ else:
     try:
         import torch
         from transformers import LogitsProcessor
-    except ImportError:
+    except ModuleNotFoundError as exc:
+        if exc.name not in {"torch", "transformers"}:
+            raise
         torch = Any  # type: ignore[assignment,misc]
 
         class LogitsProcessor:  # type: ignore[no-redef]
@@ -30,8 +33,44 @@ class TransformersDecision:
     action: str
     token_id: int
     raw_scores: Mapping[str, float]
-    probabilities: Mapping[str, float]
-    backend_reported_probabilities: Mapping[str, float]
+    expected_probabilities: Mapping[str, float]
+    sampled_probabilities: Mapping[str, float]
+
+
+def _neutral_generation_config_kwargs(
+    *,
+    eos_token_id: int | list[int] | None,
+    bos_token_id: int | None,
+    temperature: float,
+) -> dict[str, Any]:
+    """Return an action-only config that does not inherit model-card score transforms."""
+    return {
+        "max_new_tokens": 1,
+        "do_sample": temperature > 0,
+        "temperature": temperature if temperature > 0 else None,
+        "top_k": None,
+        "top_p": None,
+        "min_p": None,
+        "typical_p": None,
+        "epsilon_cutoff": None,
+        "eta_cutoff": None,
+        "repetition_penalty": 1.0,
+        "encoder_repetition_penalty": 1.0,
+        "no_repeat_ngram_size": 0,
+        "diversity_penalty": 0.0,
+        "sequence_bias": None,
+        "bad_words_ids": None,
+        "suppress_tokens": None,
+        "begin_suppress_tokens": None,
+        "forced_bos_token_id": None,
+        "forced_eos_token_id": None,
+        "watermarking_config": None,
+        "renormalize_logits": False,
+        "pad_token_id": eos_token_id,
+        "eos_token_id": eos_token_id,
+        "bos_token_id": bos_token_id,
+        "use_cache": True,
+    }
 
 
 class FirstTokenBayesianLogitsProcessor(LogitsProcessor):
@@ -60,6 +99,11 @@ class FirstTokenBayesianLogitsProcessor(LogitsProcessor):
             action_token_ids
         ):
             raise ValueError("at least two distinct action token IDs are required")
+        if not all(
+            type(token_id) is int and token_id >= 0
+            for token_id in action_token_ids.values()
+        ):
+            raise ValueError("action token IDs must be nonnegative integers")
         if not math.isfinite(beta) or not 0 <= beta <= 1:
             raise ValueError("beta must be finite and in [0, 1]")
         if not math.isfinite(sampling_temperature) or sampling_temperature < 0:
@@ -121,6 +165,7 @@ class TransformersNativeBackend:
         self.tokenizer = tokenizer
         self.model_id = model_id or str(getattr(model, "name_or_path", "unknown"))
         self.chat_template_kwargs = dict(chat_template_kwargs or {})
+        self._generation_lock = threading.Lock()
 
     @staticmethod
     def _messages(
@@ -239,25 +284,33 @@ class TransformersNativeBackend:
             beta=beta,
             sampling_temperature=temperature,
         )
-        torch.manual_seed(request.seed)
-        if torch.cuda.is_available():
-            torch.cuda.manual_seed_all(request.seed)
+        from transformers import GenerationConfig
+
+        generation_config = GenerationConfig(
+            **_neutral_generation_config_kwargs(
+                eos_token_id=self.tokenizer.eos_token_id,
+                bos_token_id=getattr(self.tokenizer, "bos_token_id", None),
+                temperature=temperature,
+            )
+        )
         generation_kwargs: dict[str, Any] = {
             "input_ids": input_ids,
-            "max_new_tokens": 1,
+            "attention_mask": torch.ones_like(input_ids),
+            "generation_config": generation_config,
             "logits_processor": [processor],
-            "pad_token_id": self.tokenizer.eos_token_id,
             "return_dict_in_generate": True,
             "output_scores": True,
-            # Do not inherit model-card truncation defaults for the categorical action.
-            "top_p": 1.0,
         }
-        if temperature > 0:
-            generation_kwargs.update({"do_sample": True, "temperature": temperature})
-        else:
-            generation_kwargs["do_sample"] = False
-        with torch.inference_mode():
-            generated = self.model.generate(**generation_kwargs)
+        cuda_devices = (
+            [input_ids.device.index]
+            if input_ids.device.type == "cuda" and input_ids.device.index is not None
+            else []
+        )
+        with self._generation_lock, torch.random.fork_rng(devices=cuda_devices):
+            torch.manual_seed(request.seed)
+            self.model.eval()
+            with torch.inference_mode():
+                generated = self.model.generate(**generation_kwargs)
         token_id = int(generated.sequences[0, -1].item())
         actions_by_token_id = {value: action for action, value in action_token_ids.items()}
         if token_id not in actions_by_token_id:
@@ -274,6 +327,6 @@ class TransformersNativeBackend:
             action=actions_by_token_id[token_id],
             token_id=token_id,
             raw_scores=processor.last_raw_scores,
-            probabilities=corrected.probabilities,
-            backend_reported_probabilities=softmax(backend_scores),
+            expected_probabilities=corrected.probabilities,
+            sampled_probabilities=softmax(backend_scores),
         )

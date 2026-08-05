@@ -43,8 +43,10 @@ The score mode is configured server-wide and cannot be selected per request. The
 therefore requires an explicit caller attestation and records it in every result. A public
 endpoint that does not disclose its mode is not a supported deployment.
 
-The server's sampled token is ignored for corrected decisions. The client applies the
-formula and samples with its own seeded RNG.
+`score()` returns the server's constrained but uncorrected sample in
+`ScoreResult.selected_action` for diagnostics. `decide()` ignores that sample, applies the
+formula to the returned raw scores, and samples with its own seeded RNG; it returns both the
+score response and corrected decision.
 
 Chat continuation resends and re-renders the complete history; vLLM does not provide a
 persistent conversation handle. For strict token-level continuation, prefer the completions

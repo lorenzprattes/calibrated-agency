@@ -115,7 +115,8 @@ paper protocol.
 
 A reusable prior must be keyed by the full scoring identity: model and tokenizer revisions,
 chat-template and prompt hashes, action labels/order/token IDs, menu, context dataset,
-estimator, score mode, backend version, and generation settings.
+estimator settings (including pseudocounts and context/sampling seeds), score mode, backend
+version, and generation settings.
 
 ## Validation
 
@@ -127,8 +128,13 @@ uv run mypy
 ```
 
 Live parity scripts compare pairwise candidate log odds rather than absolute logits, because
-additive constants are irrelevant and kernels may differ numerically. See
-[`docs/validation.md`](docs/validation.md).
+additive constants are irrelevant and kernels may differ numerically. On two A100s, the
+vLLM API and vLLM native implementations agreed within `3.3e-7` log odds for Qwen3.5-4B and
+`1.8e-7` for Llama-3.1-8B. Both native processors matched the shared correction within
+`5.3e-7`. Cross-runtime vLLM/Transformers raw-score parity failed the deliberately stricter
+tolerance, so identical trajectories across those runtimes are not claimed. See
+[`docs/validation.md`](docs/validation.md) and the
+[retained report](validation/gsc-2026-08-05/README.md).
 
 No historical social-media data is distributed. Examples and unit tests are synthetic.
 

@@ -1,0 +1,53 @@
+{
+  "model": "unsloth/Llama-3.1-8B-Instruct",
+  "score_parity": [
+    {
+      "name": "api_vs_vllm_native",
+      "contexts": 8,
+      "max_absolute_log_odds_error": 1.7182901501655579e-07,
+      "mean_absolute_log_odds_error": 5.675246939063072e-08,
+      "max_corrected_probability_error": 1.631104057375765e-08,
+      "token_id_mismatches": 0,
+      "thresholds": {
+        "log_odds": 0.001,
+        "probability": 0.0001
+      },
+      "passed": true
+    },
+    {
+      "name": "api_vs_transformers",
+      "contexts": 8,
+      "max_absolute_log_odds_error": 0.25,
+      "mean_absolute_log_odds_error": 0.09375004048342817,
+      "max_corrected_probability_error": 0.05506572513251873,
+      "token_id_mismatches": 0,
+      "thresholds": {
+        "log_odds": 0.05,
+        "probability": 0.01
+      },
+      "passed": false
+    }
+  ],
+  "native_processor_parity": [
+    {
+      "backend": "vllm-native",
+      "decisions": 24,
+      "missing_backend_reported": 0,
+      "max_expected_vs_backend_probability_error": 2.615996342325566e-07,
+      "beta_zero_max_target_error": 2.4451346170017985e-08,
+      "tolerance": 1e-05,
+      "passed": true
+    },
+    {
+      "backend": "transformers",
+      "decisions": 24,
+      "missing_backend_reported": 0,
+      "max_expected_vs_backend_probability_error": 3.482634605145307e-07,
+      "beta_zero_max_target_error": 2.4451346170017985e-08,
+      "tolerance": 1e-05,
+      "passed": true
+    }
+  ],
+  "cross_runtime_diagnostic_passed": false,
+  "passed": true
+}

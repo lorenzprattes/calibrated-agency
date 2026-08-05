@@ -3,15 +3,19 @@
 ## Method provenance
 
 This package is a fresh, generalized implementation of the Bayesian action-prior correction
-used in the following research codebase:
+introduced in:
+
+> Ruggero Marino Lazzaroni, Lorenz Prattes, and Jana Lasser. “Calibrated but Autonomous:
+> Inference-Time Bayesian Logit Correction for LLM Social Simulations.” 2026. OpenReview:
+> https://openreview.net/forum?id=9EZgvMOHXn
+
+Paper PDF: https://openreview.net/pdf?id=9EZgvMOHXn
+
+Reference research code:
 
 - https://github.com/cs2-lab/bayesian-inference-gabm
-- reference revision inspected during development:
+- revision inspected during development:
   `def1eaa6508f21bbaf0ac5fee2147c6dcd201d25`
-
-A formal paper citation has not yet been added because publication metadata was not included
-in the inspected repository. Add the definitive citation before a public release rather than
-inventing or guessing bibliographic fields.
 
 ## Runtime contracts
 

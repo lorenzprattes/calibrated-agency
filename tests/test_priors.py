@@ -68,6 +68,20 @@ def test_fitted_intercepts_preserve_between_context_log_odds() -> None:
     assert corrected_difference == pytest.approx(beta * raw_difference)
 
 
+def test_exact_intercepts_handle_multiclass_extreme_scores() -> None:
+    scores = [
+        {"a": 20.0, "b": 0.0, "c": -20.0},
+        {"a": -20.0, "b": 20.0, "c": 0.0},
+        {"a": 0.0, "b": -20.0, "c": 20.0},
+        {"a": 4.0, "b": 2.0, "c": -3.0},
+    ]
+    target = {"a": 0.01, "b": 0.19, "c": 0.80}
+    fit = fit_marginal_intercepts(
+        scores, target, beta=0.6, tolerance=1e-9, max_iterations=50_000
+    )
+    assert fit.achieved_rates == pytest.approx(target, abs=1e-9)
+
+
 def test_beta_zero_fit_is_immediate() -> None:
     fit = fit_marginal_intercepts(
         [{"a": 100.0, "b": -100.0}], {"a": 0.3, "b": 0.7}, beta=0

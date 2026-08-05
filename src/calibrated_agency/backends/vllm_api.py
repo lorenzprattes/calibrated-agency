@@ -15,8 +15,9 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from calibrated_agency.backends.base import ContinuationResult
+from calibrated_agency.correction import decide as core_decide
 from calibrated_agency.correction import softmax
-from calibrated_agency.schemas import ChatMessage, ScoreRequest, ScoreResult
+from calibrated_agency.schemas import ChatMessage, ScoredDecision, ScoreRequest, ScoreResult
 
 _TOKEN_ID_PATTERN = re.compile(r"token_id:(\d+)")
 
@@ -68,6 +69,8 @@ class VllmApiBackend:
             raise VllmApiError(f"HTTP {exc.code} from {path}: {body[:2000]}") from exc
         except (urllib.error.URLError, TimeoutError) as exc:
             raise VllmApiError(f"request to {path} failed: {exc}") from exc
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise VllmApiError(f"{path} returned malformed JSON") from exc
         if not isinstance(decoded, dict):
             raise VllmApiError(f"{path} returned a non-object JSON response")
         return decoded
@@ -255,9 +258,30 @@ class VllmApiBackend:
                 "model": self.model,
                 "declared_logprobs_mode": self.logprobs_mode,
                 "latency_seconds": latency,
+                "selected_action_semantics": "uncorrected_server_sample_ignored_by_decide",
             },
             raw_response=response,
         )
+
+    def decide(
+        self,
+        request: ScoreRequest,
+        *,
+        prior: Mapping[str, float],
+        target: Mapping[str, float],
+        beta: float,
+        seed: int | None = None,
+    ) -> ScoredDecision:
+        """Score through vLLM, then sample the corrected policy client-side."""
+        score = self.score(request)
+        decision = core_decide(
+            score.raw_scores,
+            prior,
+            target,
+            beta,
+            seed=request.seed if seed is None else seed,
+        )
+        return ScoredDecision(score, decision)
 
     def continue_from(
         self,

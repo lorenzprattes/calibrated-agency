@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import urllib.request
 from collections.abc import Mapping
 from typing import Any
 
@@ -95,10 +96,45 @@ def test_vllm_api_scores_explicit_boundary_token_ids() -> None:
     assert chat_payload["top_p"] == 1.0
 
 
+def test_vllm_api_decides_from_corrected_scores_not_server_sample() -> None:
+    backend = FakeVllmBackend()
+    result = backend.decide(
+        request(),
+        prior={"post": 0.5, "comment": 0.5},
+        target={"post": 0.01, "comment": 0.99},
+        beta=0.0,
+        seed=1,
+    )
+    assert result.score.selected_action == "post"
+    assert result.decision.action == "comment"
+    assert result.decision.probabilities == pytest.approx(
+        {"post": 0.01, "comment": 0.99}
+    )
+
+
 def test_vllm_api_rejects_label_that_is_not_appended_at_boundary() -> None:
     backend = FakeVllmBackend(malformed_boundary=True)
     with pytest.raises(VllmApiError, match="rendered generation boundary"):
         backend.score(request())
+
+
+def test_vllm_api_wraps_malformed_json(monkeypatch: pytest.MonkeyPatch) -> None:
+    class InvalidResponse:
+        def __enter__(self) -> InvalidResponse:
+            return self
+
+        def __exit__(self, *args: object) -> None:
+            return None
+
+        def read(self) -> bytes:
+            return b"not-json"
+
+    monkeypatch.setattr(urllib.request, "urlopen", lambda *args, **kwargs: InvalidResponse())
+    backend = VllmApiBackend(
+        "http://unused", model="model", logprobs_mode="raw_logprobs"
+    )
+    with pytest.raises(VllmApiError, match="malformed JSON"):
+        backend._request("/v1/models")
 
 
 def test_vllm_api_requires_declared_raw_score_mode() -> None:

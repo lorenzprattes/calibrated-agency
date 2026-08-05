@@ -125,7 +125,8 @@ run_container python3 scripts/compare_live.py \
   --vllm-native "${RESULTS}/vllm-native.json" \
   --transformers "${RESULTS}/transformers.json" \
   --output "${RESULTS}/summary.json" \
-  --report "${RESULTS}/REPORT.md"
+  --report "${RESULTS}/REPORT.md" \
+  --strict
 
 run_container python3 - <<'PY' >"${RESULTS}/versions.json"
 import importlib.metadata as metadata

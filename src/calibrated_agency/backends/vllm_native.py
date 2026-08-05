@@ -35,7 +35,9 @@ else:
             LogitsProcessor,
             MoveDirectionality,
         )
-    except ImportError:
+    except ModuleNotFoundError as exc:
+        if exc.name not in {"torch", "vllm"}:
+            raise
         torch = Any  # type: ignore[assignment,misc]
         SamplingParams = Any  # type: ignore[assignment,misc]
         VllmConfig = Any  # type: ignore[assignment,misc]
@@ -49,6 +51,54 @@ else:
 
 
 VLLM_EXTRA_KEY = "calibrated_agency"
+_PROCESSOR_CONFIG_KEYS = {
+    "action_token_ids",
+    "log_prior",
+    "log_target",
+    "beta",
+    "trigger_token_ids",
+    "apply_at_first_token",
+    "compensate_temperature",
+}
+
+
+def _validate_processor_config(config: object) -> dict[str, Any]:
+    if not isinstance(config, dict) or set(config) != _PROCESSOR_CONFIG_KEYS:
+        raise ValueError("malformed calibrated-agency vLLM processor configuration")
+    action_token_ids = config["action_token_ids"]
+    if not isinstance(action_token_ids, dict) or len(action_token_ids) < 2:
+        raise ValueError("processor requires at least two action token IDs")
+    if not all(isinstance(action, str) and action for action in action_token_ids):
+        raise ValueError("processor action names must be nonempty strings")
+    token_ids = list(action_token_ids.values())
+    if not all(type(token_id) is int and token_id >= 0 for token_id in token_ids):
+        raise ValueError("processor action token IDs must be nonnegative integers")
+    if len(set(token_ids)) != len(token_ids):
+        raise ValueError("processor action token IDs must be distinct")
+
+    for field in ("log_prior", "log_target"):
+        values = config[field]
+        if not isinstance(values, dict) or set(values) != set(action_token_ids):
+            raise ValueError(f"processor {field} keys must match actions")
+        if not all(
+            type(value) in {int, float} and math.isfinite(value) for value in values.values()
+        ):
+            raise ValueError(f"processor {field} values must be finite numbers")
+
+    beta = config["beta"]
+    if type(beta) not in {int, float} or not math.isfinite(beta) or not 0 <= beta <= 1:
+        raise ValueError("processor beta must be finite and in [0, 1]")
+    trigger_token_ids = config["trigger_token_ids"]
+    if not isinstance(trigger_token_ids, list) or not all(
+        type(token_id) is int and token_id >= 0 for token_id in trigger_token_ids
+    ):
+        raise ValueError("processor trigger token IDs must be nonnegative integers")
+    for field in ("apply_at_first_token", "compensate_temperature"):
+        if type(config[field]) is not bool:
+            raise ValueError(f"processor {field} must be boolean")
+    if config["apply_at_first_token"] == bool(trigger_token_ids):
+        raise ValueError("processor requires exactly one activation mode")
+    return config
 
 
 def make_vllm_extra_args(
@@ -67,38 +117,26 @@ def make_vllm_extra_args(
     nonempty trigger. Temperature compensation multiplies corrected logits by the request
     temperature because vLLM applies custom processors before its temperature warper.
     """
-    if len(action_token_ids) < 2:
-        raise ValueError("at least two action token IDs are required")
     if set(action_token_ids) != set(prior) or set(action_token_ids) != set(target):
         raise ValueError("action token, prior, and target keys must match")
-    if len(set(action_token_ids.values())) != len(action_token_ids):
-        raise ValueError("action token IDs must be distinct")
-    if any(token_id < 0 for token_id in action_token_ids.values()):
-        raise ValueError("action token IDs must be nonnegative")
-    if not math.isfinite(beta) or not 0 <= beta <= 1:
-        raise ValueError("beta must be finite and in [0, 1]")
-    if apply_at_first_token == bool(trigger_token_ids):
-        raise ValueError("choose exactly one of first-token or trigger activation")
     normalized_prior = normalize_probabilities(prior)
     normalized_target = normalize_probabilities(target)
-    return {
-        VLLM_EXTRA_KEY: {
-            "action_token_ids": dict(action_token_ids),
-            "log_prior": {action: math.log(value) for action, value in normalized_prior.items()},
-            "log_target": {
-                action: math.log(value) for action, value in normalized_target.items()
-            },
-            "beta": beta,
-            "trigger_token_ids": list(trigger_token_ids or []),
-            "apply_at_first_token": apply_at_first_token,
-            "compensate_temperature": compensate_temperature,
-        }
+    config = {
+        "action_token_ids": dict(action_token_ids),
+        "log_prior": {action: math.log(value) for action, value in normalized_prior.items()},
+        "log_target": {action: math.log(value) for action, value in normalized_target.items()},
+        "beta": beta,
+        "trigger_token_ids": list(trigger_token_ids or []),
+        "apply_at_first_token": apply_at_first_token,
+        "compensate_temperature": compensate_temperature,
     }
+    _validate_processor_config(config)
+    return {VLLM_EXTRA_KEY: config}
 
 
 @dataclass
 class _RequestState:
-    prompt_token_ids: list[int]
+    prompt_token_ids: list[int] | None
     output_token_ids: list[int]
     action_token_ids: dict[str, int]
     log_prior: dict[str, float]
@@ -114,13 +152,16 @@ class _RequestState:
     def from_sampling_params(
         cls,
         params: SamplingParams,
-        prompt_token_ids: list[int],
+        prompt_token_ids: list[int] | None,
         output_token_ids: list[int],
     ) -> _RequestState | None:
         extra_args = params.extra_args
         if not extra_args or VLLM_EXTRA_KEY not in extra_args:
             return None
-        config = extra_args[VLLM_EXTRA_KEY]
+        config = _validate_processor_config(extra_args[VLLM_EXTRA_KEY])
+        temperature = float(params.temperature)
+        if not math.isfinite(temperature) or temperature < 0:
+            raise ValueError("processor temperature must be finite and nonnegative")
         return cls(
             prompt_token_ids=prompt_token_ids,
             output_token_ids=output_token_ids,
@@ -131,7 +172,7 @@ class _RequestState:
             trigger_token_ids=list(config["trigger_token_ids"]),
             apply_at_first_token=bool(config["apply_at_first_token"]),
             compensate_temperature=bool(config["compensate_temperature"]),
-            temperature=float(params.temperature),
+            temperature=temperature,
         )
 
     def should_apply(self) -> bool:
@@ -145,6 +186,8 @@ class _RequestState:
         if len(self.output_token_ids) >= trigger_length:
             tail = self.output_token_ids[-trigger_length:]
         else:
+            if self.prompt_token_ids is None:
+                raise RuntimeError("trigger activation requires prompt token IDs")
             sequence = [*self.prompt_token_ids, *self.output_token_ids]
             tail = sequence[-trigger_length:]
         return tail == self.trigger_token_ids
@@ -167,27 +210,7 @@ class BayesianActionLogitsProcessor(LogitsProcessor):
         extra_args = params.extra_args
         if not extra_args or VLLM_EXTRA_KEY not in extra_args:
             return
-        config = extra_args[VLLM_EXTRA_KEY]
-        required = {
-            "action_token_ids",
-            "log_prior",
-            "log_target",
-            "beta",
-            "trigger_token_ids",
-            "apply_at_first_token",
-            "compensate_temperature",
-        }
-        if not isinstance(config, dict) or set(config) != required:
-            raise ValueError("malformed calibrated-agency vLLM processor configuration")
-        action_token_ids = config["action_token_ids"]
-        if not isinstance(action_token_ids, dict) or len(action_token_ids) < 2:
-            raise ValueError("processor requires at least two action token IDs")
-        if set(action_token_ids) != set(config["log_prior"]) or set(action_token_ids) != set(
-            config["log_target"]
-        ):
-            raise ValueError("processor action, prior, and target keys must match")
-        if bool(config["apply_at_first_token"]) == bool(config["trigger_token_ids"]):
-            raise ValueError("processor requires exactly one activation mode")
+        _validate_processor_config(extra_args[VLLM_EXTRA_KEY])
 
     def is_argmax_invariant(self) -> bool:
         return False
@@ -244,8 +267,8 @@ class BayesianActionLogitsProcessor(LogitsProcessor):
 class VllmNativeDecision:
     action: str
     token_id: int
-    probabilities: Mapping[str, float]
-    backend_reported_probabilities: Mapping[str, float] | None
+    raw_scores: Mapping[str, float] | None
+    sampled_probabilities: Mapping[str, float]
 
 
 class VllmNativeBackend:
@@ -400,36 +423,66 @@ class VllmNativeBackend:
         return token_id, raw_scores, completion
 
     def score(self, request: ScoreRequest) -> ScoreResult:
-        prompt_token_ids, action_token_ids = self.resolve_token_ids(request)
-        uniform = {action: 1.0 for action in action_token_ids}
-        extra_args = make_vllm_extra_args(
-            action_token_ids=action_token_ids,
-            prior=uniform,
-            target=uniform,
-            beta=1.0,
-            apply_at_first_token=True,
-        )
-        token_id, raw_scores, _ = self._generate_one(
-            prompt_token_ids,
-            action_token_ids,
-            extra_args=extra_args,
-            seed=request.seed,
-            temperature=1.0,
-        )
-        actions_by_token_id = {value: action for action, value in action_token_ids.items()}
-        if token_id not in actions_by_token_id:
-            raise RuntimeError("native processor generated a token outside the action set")
-        return ScoreResult(
-            raw_scores=raw_scores,
-            probabilities=softmax(raw_scores),
-            token_ids=action_token_ids,
-            selected_action=actions_by_token_id[token_id],
-            metadata={
-                "backend": "vllm_native",
-                "model": self.model_id,
-                "logprobs_mode": self.logprobs_mode,
-            },
-        )
+        return self.score_batch([request])[0]
+
+    def score_batch(self, requests: Sequence[ScoreRequest]) -> list[ScoreResult]:
+        """Score several requests in one vLLM scheduler batch."""
+        if not requests:
+            raise ValueError("score_batch requires at least one request")
+        from vllm import SamplingParams as VllmSamplingParams
+
+        prompts: list[dict[str, list[int]]] = []
+        parameters: list[Any] = []
+        token_maps: list[dict[str, int]] = []
+        for request in requests:
+            prompt_token_ids, action_token_ids = self.resolve_token_ids(request)
+            uniform = {action: 1.0 for action in action_token_ids}
+            extra_args = make_vllm_extra_args(
+                action_token_ids=action_token_ids,
+                prior=uniform,
+                target=uniform,
+                beta=1.0,
+                apply_at_first_token=True,
+            )
+            prompts.append({"prompt_token_ids": prompt_token_ids})
+            parameters.append(
+                VllmSamplingParams(
+                    temperature=1.0,
+                    max_tokens=1,
+                    seed=request.seed,
+                    logprobs=len(action_token_ids),
+                    logprob_token_ids=list(action_token_ids.values()),
+                    extra_args=extra_args,
+                )
+            )
+            token_maps.append(action_token_ids)
+
+        outputs = self.llm.generate(prompts, parameters, use_tqdm=False)
+        results: list[ScoreResult] = []
+        for output, action_token_ids in zip(outputs, token_maps, strict=True):
+            completion = output.outputs[0]
+            token_id = int(completion.token_ids[0])
+            raw_scores = self._extract_logprobs(completion, action_token_ids)
+            actions_by_token_id = {
+                value: action for action, value in action_token_ids.items()
+            }
+            if token_id not in actions_by_token_id:
+                raise RuntimeError("native processor generated a token outside the action set")
+            results.append(
+                ScoreResult(
+                    raw_scores=raw_scores,
+                    probabilities=softmax(raw_scores),
+                    token_ids=action_token_ids,
+                    selected_action=actions_by_token_id[token_id],
+                    metadata={
+                        "backend": "vllm_native",
+                        "model": self.model_id,
+                        "logprobs_mode": self.logprobs_mode,
+                        "batch_size": len(requests),
+                    },
+                )
+            )
+        return results
 
     def decide_native(
         self,
@@ -459,16 +512,19 @@ class VllmNativeBackend:
         actions_by_token_id = {value: action for action, value in action_token_ids.items()}
         if token_id not in actions_by_token_id:
             raise RuntimeError("native processor generated a token outside the action set")
-        raw = self.score(request)
-        corrected = bayesian_correct(raw.raw_scores, prior, target, beta)
-        reported_probabilities = (
-            softmax(reported_scores)
-            if self.logprobs_mode in {"processed_logprobs", "processed_logits"}
-            else None
-        )
+        raw_scores: Mapping[str, float] | None
+        sampled_probabilities: Mapping[str, float]
+        if self.logprobs_mode in {"processed_logprobs", "processed_logits"}:
+            raw_scores = None
+            sampled_probabilities = softmax(reported_scores)
+        else:
+            raw_scores = reported_scores
+            sampled_probabilities = bayesian_correct(
+                reported_scores, prior, target, beta
+            ).probabilities
         return VllmNativeDecision(
             action=actions_by_token_id[token_id],
             token_id=token_id,
-            probabilities=corrected.probabilities,
-            backend_reported_probabilities=reported_probabilities,
+            raw_scores=raw_scores,
+            sampled_probabilities=sampled_probabilities,
         )

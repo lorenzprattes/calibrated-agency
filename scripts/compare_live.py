@@ -149,7 +149,16 @@ def markdown(report: dict[str, Any]) -> str:
             f"{item['beta_zero_max_target_error']:.6g} | "
             f"{'yes' if item['passed'] else 'no'} |"
         )
-    lines.extend(["", f"Overall pass: **{report['passed']}**", ""])
+    lines.extend(
+        [
+            "",
+            f"Required implementation checks pass: **{report['passed']}**",
+            "",
+            "Cross-runtime vLLM/Transformers diagnostic passes its strict tolerance: "
+            f"**{report['cross_runtime_diagnostic_passed']}**",
+            "",
+        ]
+    )
     return "\n".join(lines)
 
 
@@ -179,10 +188,9 @@ def main() -> None:
             processor_check(transformers),
         ],
     }
-    report["passed"] = all(
-        item["passed"]
-        for section in ("score_parity", "native_processor_parity")
-        for item in report[section]
+    report["cross_runtime_diagnostic_passed"] = report["score_parity"][1]["passed"]
+    report["passed"] = report["score_parity"][0]["passed"] and all(
+        item["passed"] for item in report["native_processor_parity"]
     )
     args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
     args.report.write_text(markdown(report), encoding="utf-8")

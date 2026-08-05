@@ -146,3 +146,11 @@ class DecisionResult:
         object.__setattr__(
             self, "corrected_log_scores", MappingProxyType(dict(self.corrected_log_scores))
         )
+
+
+@dataclass(frozen=True)
+class ScoredDecision:
+    """A backend score response and the corrected client-side decision derived from it."""
+
+    score: ScoreResult
+    decision: DecisionResult

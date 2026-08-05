@@ -102,6 +102,10 @@ def test_fingerprint_supports_dataclasses_paths_and_sets(tmp_path: Path) -> None
     )
     with pytest.raises(TypeError, match="unsupported"):
         canonical_json(object())
+    with pytest.raises(TypeError, match="keys"):
+        canonical_json({1: "integer key"})
+    with pytest.raises(ValueError, match="finite"):
+        canonical_json({"value": math.inf})
 
 
 def test_prior_cache_identity_changes_on_menu_or_temperature() -> None:
@@ -117,6 +121,7 @@ def test_prior_cache_identity_changes_on_menu_or_temperature() -> None:
         token_ids={"a": 1, "b": 2},
         context_dataset_hash="contexts",
         estimator="probability_mean",
+        estimator_settings={"pseudocount": 0.0, "context_seed": 12345},
         sample_count=10,
         score_mode="raw_logprobs",
         generation_settings={"temperature": 1.0},
@@ -126,5 +131,12 @@ def test_prior_cache_identity_changes_on_menu_or_temperature() -> None:
         **{**base, "generation_settings": {"temperature": 0.7}}
     )
     assert fingerprint(first) != fingerprint(changed)
+    changed_estimator = prior_cache_identity(
+        **{
+            **base,
+            "estimator_settings": {"pseudocount": 1.0, "context_seed": 12345},
+        }
+    )
+    assert fingerprint(first) != fingerprint(changed_estimator)
     with pytest.raises(ValueError, match="positive"):
         prior_cache_identity(**{**base, "sample_count": 0})

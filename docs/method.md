@@ -76,7 +76,7 @@ q(a|x) = softmax_a(beta * r_a(x) + intercept_a)
 ```
 
 It iteratively chooses constant action intercepts until the average distribution on supplied
-calibration contexts equals the target. Because intercepts are constant over contexts, the
+calibration contexts matches the target to a declared numerical tolerance. Because intercepts are constant over contexts, the
 same pairwise context-responsiveness identity holds.
 
 This guarantee is empirical: it applies to the calibration contexts. Distribution shift,

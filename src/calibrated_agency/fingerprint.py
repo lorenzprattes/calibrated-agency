@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
@@ -16,12 +17,22 @@ def _canonicalize(value: Any) -> Any:
     if isinstance(value, Path):
         return str(value)
     if isinstance(value, Mapping):
-        return {str(key): _canonicalize(item) for key, item in sorted(value.items())}
+        if not all(isinstance(key, str) for key in value):
+            raise TypeError("fingerprint mapping keys must be strings")
+        return {key: _canonicalize(value[key]) for key in sorted(value)}
     if isinstance(value, tuple | list):
         return [_canonicalize(item) for item in value]
     if isinstance(value, set | frozenset):
-        return sorted(_canonicalize(item) for item in value)
-    if value is None or isinstance(value, str | int | float | bool):
+        canonical_items = [_canonicalize(item) for item in value]
+        return sorted(
+            canonical_items,
+            key=lambda item: json.dumps(item, sort_keys=True, ensure_ascii=False),
+        )
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ValueError("fingerprint floats must be finite")
+        return value
+    if value is None or isinstance(value, str | int | bool):
         return value
     raise TypeError(f"unsupported fingerprint value: {type(value).__name__}")
 
@@ -58,6 +69,7 @@ def prior_cache_identity(
     token_ids: Mapping[str, int],
     context_dataset_hash: str,
     estimator: str,
+    estimator_settings: Mapping[str, Any],
     sample_count: int,
     score_mode: str,
     generation_settings: Mapping[str, Any],
@@ -66,7 +78,7 @@ def prior_cache_identity(
     if sample_count < 1:
         raise ValueError("sample_count must be positive")
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "backend": backend,
         "backend_version": backend_version,
         "model": model,
@@ -78,6 +90,7 @@ def prior_cache_identity(
         "token_ids": dict(token_ids),
         "context_dataset_hash": context_dataset_hash,
         "estimator": estimator,
+        "estimator_settings": dict(estimator_settings),
         "sample_count": sample_count,
         "score_mode": score_mode,
         "generation_settings": dict(generation_settings),

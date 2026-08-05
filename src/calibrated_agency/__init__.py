@@ -22,6 +22,7 @@ from .schemas import (
     Candidate,
     ChatMessage,
     DecisionResult,
+    ScoredDecision,
     ScoreRequest,
     ScoreResult,
 )
@@ -35,6 +36,7 @@ __all__ = [
     "MarginalFit",
     "ScoreRequest",
     "ScoreResult",
+    "ScoredDecision",
     "apply_intercepts",
     "bayesian_correct",
     "contextual_log_odds",
