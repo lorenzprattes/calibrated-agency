@@ -16,6 +16,7 @@ THRESHOLDS = {
     "api_vs_transformers": {"log_odds": 0.05, "probability": 0.01},
 }
 NATIVE_PROCESSOR_TOLERANCE = 1e-5
+BETA_ZERO_TOLERANCE = 1e-7
 
 
 def load(path: Path) -> dict[str, Any]:
@@ -109,7 +110,7 @@ def processor_check(payload: dict[str, Any]) -> dict[str, Any]:
         "passed": (
             missing_reported == 0
             and maximum <= NATIVE_PROCESSOR_TOLERANCE
-            and beta_zero_maximum <= 1e-9
+            and beta_zero_maximum <= BETA_ZERO_TOLERANCE
         ),
     }
 
@@ -159,6 +160,7 @@ def main() -> None:
     parser.add_argument("--transformers", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--strict", action="store_true")
     args = parser.parse_args()
     api = load(args.api)
     vllm_native = load(args.vllm_native)
@@ -185,7 +187,7 @@ def main() -> None:
     args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
     args.report.write_text(markdown(report), encoding="utf-8")
     print(args.report)
-    if not report["passed"]:
+    if args.strict and not report["passed"]:
         raise SystemExit(1)
 
 

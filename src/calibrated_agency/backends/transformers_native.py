@@ -29,6 +29,7 @@ else:
 class TransformersDecision:
     action: str
     token_id: int
+    raw_scores: Mapping[str, float]
     probabilities: Mapping[str, float]
     backend_reported_probabilities: Mapping[str, float]
 
@@ -76,10 +77,17 @@ class FirstTokenBayesianLogitsProcessor(LogitsProcessor):
         self.beta = beta
         self.sampling_temperature = sampling_temperature
         self.compensate_temperature = compensate_temperature
+        self.last_raw_scores: dict[str, float] | None = None
 
     def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor) -> torch.FloatTensor:
         if input_ids.shape[1] != self.prompt_length:
             return scores
+        if scores.shape[0] != 1:
+            raise RuntimeError("the first release supports one Transformers decision at a time")
+        self.last_raw_scores = {
+            action: float(scores[0, token_id].item())
+            for action, token_id in self.action_token_ids.items()
+        }
         corrected_scores = scores.new_full(scores.shape, float("-inf"))
         scale = (
             self.sampling_temperature
@@ -252,8 +260,9 @@ class TransformersNativeBackend:
         actions_by_token_id = {value: action for action, value in action_token_ids.items()}
         if token_id not in actions_by_token_id:
             raise RuntimeError("native processor generated a token outside the action set")
-        scored = self.score(request)
-        corrected = bayesian_correct(scored.raw_scores, prior, target, beta)
+        if processor.last_raw_scores is None:
+            raise RuntimeError("Transformers did not invoke the action logits processor")
+        corrected = bayesian_correct(processor.last_raw_scores, prior, target, beta)
         first_scores = generated.scores[0][0]
         backend_scores = {
             action: float(first_scores[candidate_id].item())
@@ -262,6 +271,7 @@ class TransformersNativeBackend:
         return TransformersDecision(
             action=actions_by_token_id[token_id],
             token_id=token_id,
+            raw_scores=processor.last_raw_scores,
             probabilities=corrected.probabilities,
             backend_reported_probabilities=softmax(backend_scores),
         )

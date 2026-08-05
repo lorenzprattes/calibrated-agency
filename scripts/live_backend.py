@@ -194,6 +194,11 @@ def run(mode: str, model_id: str, base_url: str | None) -> dict[str, Any]:
                             "temperature": temperature,
                             "action": decision.action,
                             "token_id": decision.token_id,
+                            "raw_scores": (
+                                None
+                                if not hasattr(decision, "raw_scores")
+                                else dict(decision.raw_scores)
+                            ),
                             "expected_probabilities": dict(decision.probabilities),
                             "backend_reported_probabilities": (
                                 None

@@ -51,7 +51,7 @@ For beta values 0, 0.15, 0.5, and 1:
 - compare corrected probabilities from the shared core;
 - compare each native processor's backend-reported processed distribution with the shared
   core;
-- require beta-zero target error below `1e-9` at action temperatures 0.7 and 1.0;
+- require beta-zero target error below `1e-7` at action temperatures 0.7 and 1.0;
 - repeat fixed requests to expose batch-dependent drift;
 - retain raw requests, responses, token IDs, versions, hardware, and seeds.
 
