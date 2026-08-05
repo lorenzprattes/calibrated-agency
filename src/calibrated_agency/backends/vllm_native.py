@@ -321,6 +321,7 @@ class VllmNativeBackend:
             tokenize=True,
             add_generation_prompt=add_generation_prompt,
             continue_final_message=continue_final_message,
+            return_dict=False,
             **self.chat_template_kwargs,
         )
         if hasattr(token_ids, "tolist"):
