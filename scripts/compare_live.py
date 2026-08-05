@@ -84,6 +84,32 @@ def compare_pair(
     return result
 
 
+def batch_drift(payload: dict[str, Any]) -> dict[str, Any] | None:
+    batch_items = payload.get("batch_scores") or []
+    if not batch_items:
+        return None
+    sequential = score_by_context(payload)
+    batched = {int(item["context_id"]): item for item in batch_items}
+    if set(sequential) != set(batched):
+        raise ValueError("sequential and batch context IDs do not match")
+    errors: list[float] = []
+    for context_id, first in sequential.items():
+        second = batched[context_id]
+        actions = tuple(first["raw_scores"])
+        for left_index in range(len(actions)):
+            for right_index in range(left_index + 1, len(actions)):
+                left, right = actions[left_index], actions[right_index]
+                first_odds = first["raw_scores"][left] - first["raw_scores"][right]
+                second_odds = second["raw_scores"][left] - second["raw_scores"][right]
+                errors.append(abs(first_odds - second_odds))
+    return {
+        "backend": payload["mode"],
+        "contexts": len(sequential),
+        "max_sequential_vs_batch_log_odds_error": max(errors),
+        "mean_sequential_vs_batch_log_odds_error": math.fsum(errors) / len(errors),
+    }
+
+
 def processor_check(payload: dict[str, Any]) -> dict[str, Any]:
     errors: list[float] = []
     beta_zero_errors: list[float] = []
@@ -149,6 +175,17 @@ def markdown(report: dict[str, Any]) -> str:
             f"{item['beta_zero_max_target_error']:.6g} | "
             f"{'yes' if item['passed'] else 'no'} |"
         )
+    batch = report.get("batch_diagnostic")
+    if batch is not None:
+        lines.extend(
+            [
+                "",
+                "## Batch-shape diagnostic",
+                "",
+                f"Sequential-vs-batched max log-odds error: "
+                f"`{batch['max_sequential_vs_batch_log_odds_error']:.6g}`",
+            ]
+        )
     lines.extend(
         [
             "",
@@ -188,6 +225,7 @@ def main() -> None:
             processor_check(transformers),
         ],
     }
+    report["batch_diagnostic"] = batch_drift(vllm_native)
     report["cross_runtime_diagnostic_passed"] = report["score_parity"][1]["passed"]
     report["passed"] = report["score_parity"][0]["passed"] and all(
         item["passed"] for item in report["native_processor_parity"]

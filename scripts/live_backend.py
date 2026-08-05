@@ -148,10 +148,9 @@ def load_backend(mode: str, model_id: str, base_url: str | None) -> Any:
 def run(mode: str, model_id: str, base_url: str | None) -> dict[str, Any]:
     backend = load_backend(mode, model_id, base_url)
     score_requests = requests()
-    scores = (
-        backend.score_batch(score_requests)
-        if mode == "vllm-native"
-        else [backend.score(request) for request in score_requests]
+    scores = [backend.score(request) for request in score_requests]
+    batch_scores = (
+        backend.score_batch(score_requests) if mode == "vllm-native" else []
     )
     prior = probability_mean_prior([score.probabilities for score in scores])
     target = {"post": 0.2, "comment": 0.8}
@@ -163,6 +162,9 @@ def run(mode: str, model_id: str, base_url: str | None) -> dict[str, Any]:
             ),
             "contexts": list(CONTEXTS),
             "scores": [serialize_score(index, score) for index, score in enumerate(scores)],
+            "batch_scores": [
+                serialize_score(index, score) for index, score in enumerate(batch_scores)
+            ],
             "probability_mean_prior": prior,
             "target": target,
             "core_corrections": [
@@ -192,13 +194,13 @@ def run(mode: str, model_id: str, base_url: str | None) -> dict[str, Any]:
                         beta=beta,
                         temperature=temperature,
                     )
-                    expected_probabilities = (
-                        bayesian_correct(
-                            scores[context_id].raw_scores, prior, target, beta
+                    if mode == "vllm-native":
+                        reference_score = backend.score(request)
+                        expected_probabilities = bayesian_correct(
+                            reference_score.raw_scores, prior, target, beta
                         ).probabilities
-                        if mode == "vllm-native"
-                        else decision.expected_probabilities
-                    )
+                    else:
+                        expected_probabilities = decision.expected_probabilities
                     decisions.append(
                         {
                             "context_id": context_id,

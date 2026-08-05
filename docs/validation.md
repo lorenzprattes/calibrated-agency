@@ -51,6 +51,12 @@ native processor must instead match the shared correction applied to the scores 
 invocation. The diagnostic remains visible and must not be relabeled as passing when it
 exceeds its threshold.
 
+The native vLLM run also scores all contexts in one scheduler batch and reports the drift
+against sequential scoring. This is a diagnostic rather than an implementation gate because
+vLLM 0.26 does not provide batch invariance for every architecture (notably Qwen3.5 GDN
+attention). Deployments that batch decisions should calibrate and validate under that same
+batching profile.
+
 The Transformers tolerance is wider because different kernels and execution paths are not
 expected to be bitwise identical.
 
