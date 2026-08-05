@@ -255,7 +255,9 @@ class TransformersNativeBackend:
                 input_ids=input_ids,
                 attention_mask=torch.ones_like(input_ids),
             )
-        processed_scores = processor(input_ids, output.logits[:, -1, :])
+        # Generation processors operate on float32 scores even when model weights/logits
+        # use bfloat16; preserve that precision for target log-probabilities.
+        processed_scores = processor(input_ids, output.logits[:, -1, :].float())
         sampling_scores = (
             processed_scores / temperature if temperature > 0 else processed_scores
         )
