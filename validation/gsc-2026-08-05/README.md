@@ -23,13 +23,18 @@ The vLLM HTTP and in-process implementations agree to far below the predeclared 
 All candidate token IDs agreed. This establishes implementation parity for the tested
 single-token, first-position vLLM profile.
 
+The vLLM processor's expected distribution in this harness comes from an immediately
+adjacent neutral scoring forward because vLLM 0.26 cannot return raw and processed scores
+from one request. Production `decide_native` reports the sampled request's own processed
+distribution and does not perform that second forward.
+
 Both native processors also reproduced the shared core's corrected probabilities at action
 temperatures 0.7 and 1.0:
 
 | Model/backend | Max expected/reported error | β=0 target error |
 |---|---:|---:|
 | Qwen / vLLM native | 2.15e-7 | 2.45e-8 |
-| Qwen / Transformers | 5.24e-7 | 2.45e-8 |
+| Qwen / Transformers | 5.01e-7 | 2.45e-8 |
 | Llama / vLLM native | 2.62e-7 | 2.45e-8 |
 | Llama / Transformers | 3.48e-7 | 2.45e-8 |
 
@@ -82,5 +87,8 @@ and 1, and native processor distributions at temperatures 0.7 and 1.0. It did no
 multi-token labels, beams, speculative decoding, production CUDA-graph mode, long-form
 continuation quality, or behavioral usefulness of the model's contextual signal.
 
-Machine-readable summaries and their hashes are committed beside this file. Full raw logs and
-per-context artifacts remain under the ignored local `results/` directory.
+Machine-readable summaries and their hashes are committed beside this file. Full logs and
+per-context artifacts remain under the ignored local `results/` directory. These retained
+runs store reduced raw score maps, token IDs, and reconstructible synthetic inputs, but not
+the complete HTTP response bodies or explicit request seeds. The harness now serializes both
+for future runs; this limitation does not affect the reported numerical comparisons.

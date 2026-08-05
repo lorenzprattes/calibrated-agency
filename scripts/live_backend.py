@@ -68,14 +68,28 @@ def base_environment(mode: str, model: str) -> dict[str, Any]:
     }
 
 
-def serialize_score(identifier: int, score: Any) -> dict[str, Any]:
+def serialize_score(
+    identifier: int, score: Any, request: ScoreRequest
+) -> dict[str, Any]:
     return {
         "context_id": identifier,
+        "request": {
+            "messages": [message.as_dict() for message in request.messages],
+            "assistant_prefix": request.assistant_prefix,
+            "actions": [
+                {"action": candidate.action, "label": candidate.label}
+                for candidate in request.action_space.candidates
+            ],
+            "seed": request.seed,
+        },
         "raw_scores": dict(score.raw_scores),
         "probabilities": dict(score.probabilities),
         "token_ids": dict(score.token_ids),
         "selected_action": score.selected_action,
         "metadata": dict(score.metadata),
+        "raw_response": (
+            None if score.raw_response is None else dict(score.raw_response)
+        ),
     }
 
 
@@ -161,9 +175,13 @@ def run(mode: str, model_id: str, base_url: str | None) -> dict[str, Any]:
                 "processed_logprobs" if mode == "vllm-native" else "raw_logits"
             ),
             "contexts": list(CONTEXTS),
-            "scores": [serialize_score(index, score) for index, score in enumerate(scores)],
+            "scores": [
+                serialize_score(index, score, score_requests[index])
+                for index, score in enumerate(scores)
+            ],
             "batch_scores": [
-                serialize_score(index, score) for index, score in enumerate(batch_scores)
+                serialize_score(index, score, score_requests[index])
+                for index, score in enumerate(batch_scores)
             ],
             "probability_mean_prior": prior,
             "target": target,
