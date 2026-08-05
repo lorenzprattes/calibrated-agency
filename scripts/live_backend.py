@@ -102,6 +102,7 @@ def load_backend(mode: str, model_id: str, base_url: str | None) -> Any:
             dtype="bfloat16",
             max_model_len=4096,
             gpu_memory_utilization=0.88,
+            enforce_eager=True,
             logits_processors=[
                 "calibrated_agency.backends.vllm_native:BayesianActionLogitsProcessor"
             ],

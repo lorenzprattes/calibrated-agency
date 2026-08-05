@@ -25,7 +25,9 @@ runs.
 ## 2. Live backend conformance
 
 For each model, render the same synthetic chat messages and assistant prefix through each
-backend. Verify before scoring that:
+backend. The supplied GSC script uses eager vLLM execution to reduce CUDA-graph differences
+between the server and offline engine; production deployments should separately test their
+actual execution mode. Verify before scoring that:
 
 - every label appends exactly one token;
 - token IDs agree across vLLM API, vLLM native, and Transformers;
