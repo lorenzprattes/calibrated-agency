@@ -19,6 +19,18 @@ class ActionScorer(Protocol):
         ...
 
 
+class AsyncActionScorer(Protocol):
+    """Host-supplied asynchronous scoring with the same request/result contract.
+
+    Implementations propagate cancellation and leave request fitting, retries,
+    caching, and inference resource ownership to the host application.
+    """
+
+    async def score(self, request: ScoreRequest) -> ScoreResult:
+        """Return every candidate's next-token score in action-space order."""
+        ...
+
+
 @dataclass(frozen=True)
 class ContinuationResult:
     text: str

@@ -8,7 +8,8 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from calibrated_agency.correction import bayesian_correct, normalize_probabilities, softmax
+from calibrated_agency.backends.tokenization import resolve_action_tokens
+from calibrated_agency.correction import bayesian_correct, log_normalize_weights, softmax
 from calibrated_agency.schemas import ChatMessage, ScoreRequest, ScoreResult
 
 if TYPE_CHECKING:
@@ -63,8 +64,7 @@ class FirstTokenBayesianLogitsProcessor(LogitsProcessor):
         ):
             raise ValueError("at least two distinct action token IDs are required")
         if not all(
-            type(token_id) is int and token_id >= 0
-            for token_id in action_token_ids.values()
+            type(token_id) is int and token_id >= 0 for token_id in action_token_ids.values()
         ):
             raise ValueError("action token IDs must be nonnegative integers")
         if not math.isfinite(beta) or not 0 <= beta <= 1:
@@ -73,14 +73,8 @@ class FirstTokenBayesianLogitsProcessor(LogitsProcessor):
             raise ValueError("sampling temperature must be finite and nonnegative")
         self.prompt_length = prompt_length
         self.action_token_ids = dict(action_token_ids)
-        self.log_prior = {
-            action: math.log(value)
-            for action, value in normalize_probabilities(prior).items()
-        }
-        self.log_target = {
-            action: math.log(value)
-            for action, value in normalize_probabilities(target).items()
-        }
+        self.log_prior = log_normalize_weights(prior)
+        self.log_target = log_normalize_weights(target)
         self.beta = beta
         self.sampling_temperature = sampling_temperature
         self.compensate_temperature = compensate_temperature
@@ -95,6 +89,8 @@ class FirstTokenBayesianLogitsProcessor(LogitsProcessor):
             action: float(scores[0, token_id].item())
             for action, token_id in self.action_token_ids.items()
         }
+        if any(not math.isfinite(value) for value in self.last_raw_scores.values()):
+            raise RuntimeError("candidate raw logits are nonfinite")
         corrected_scores = scores.new_full(scores.shape, float("-inf"))
         scale = (
             self.sampling_temperature
@@ -170,7 +166,7 @@ class TransformersNativeBackend:
         if hasattr(token_ids, "tolist"):
             token_ids = token_ids.tolist()
         if not isinstance(token_ids, list) or not all(
-            isinstance(value, int) for value in token_ids
+            type(value) is int and value >= 0 for value in token_ids
         ):
             raise RuntimeError("chat template did not return a flat integer token list")
         return token_ids
@@ -181,23 +177,11 @@ class TransformersNativeBackend:
             assistant_prefix=request.assistant_prefix,
             candidate_label=None,
         )
-        action_token_ids: dict[str, int] = {}
-        for candidate in request.action_space.candidates:
-            candidate_ids = self._render_ids(
-                request.messages,
-                assistant_prefix=request.assistant_prefix,
-                candidate_label=candidate.label,
-            )
-            if (
-                candidate_ids[: len(base_ids)] != base_ids
-                or len(candidate_ids) != len(base_ids) + 1
-            ):
-                raise RuntimeError(
-                    f"label {candidate.label!r} is not one appended token at the rendered boundary"
-                )
-            action_token_ids[candidate.action] = candidate_ids[-1]
-        if len(set(action_token_ids.values())) != len(action_token_ids):
-            raise RuntimeError("candidate labels resolve to duplicate token IDs")
+        action_token_ids = resolve_action_tokens(
+            request.action_space,
+            lambda label: self.tokenizer.encode(label, add_special_tokens=False),
+            lambda ids: self.tokenizer.decode(ids, skip_special_tokens=False),
+        )
         return base_ids, action_token_ids
 
     def _input_tensor(self, token_ids: Sequence[int]) -> torch.LongTensor:
@@ -226,7 +210,11 @@ class TransformersNativeBackend:
             probabilities=softmax(raw_scores),
             token_ids=action_token_ids,
             selected_action=None,
-            metadata={"backend": "transformers_native", "model": self.model_id},
+            metadata={
+                "backend": "transformers_native",
+                "model": self.model_id,
+                "token_resolution": "bare_label_exact_roundtrip_v1",
+            },
         )
 
     def decide_native(
@@ -239,6 +227,8 @@ class TransformersNativeBackend:
         temperature: float = 1.0,
     ) -> TransformersDecision:
         """Apply the native processor to one forward pass and sample with a local RNG."""
+        if not math.isfinite(temperature) or temperature <= 0:
+            raise ValueError("categorical decision temperature must be finite and positive")
         base_ids, action_token_ids = self.resolve_token_ids(request)
         input_ids = self._input_tensor(base_ids)
         processor = FirstTokenBayesianLogitsProcessor(
@@ -258,9 +248,7 @@ class TransformersNativeBackend:
         # Generation processors operate on float32 scores even when model weights/logits
         # use bfloat16; preserve that precision for target log-probabilities.
         processed_scores = processor(input_ids, output.logits[:, -1, :].float())
-        sampling_scores = (
-            processed_scores / temperature if temperature > 0 else processed_scores
-        )
+        sampling_scores = processed_scores / temperature if temperature > 0 else processed_scores
         if temperature > 0:
             generator = torch.Generator(device=input_ids.device).manual_seed(request.seed)
             token_id = int(

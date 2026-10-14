@@ -6,14 +6,14 @@ import hashlib
 import json
 import math
 from collections.abc import Mapping, Sequence
-from dataclasses import asdict, is_dataclass
+from dataclasses import fields, is_dataclass
 from pathlib import Path
 from typing import Any
 
 
 def _canonicalize(value: Any) -> Any:
     if is_dataclass(value) and not isinstance(value, type):
-        return _canonicalize(asdict(value))
+        return _canonicalize({field.name: getattr(value, field.name) for field in fields(value)})
     if isinstance(value, Path):
         return str(value)
     if isinstance(value, Mapping):
@@ -73,12 +73,14 @@ def prior_cache_identity(
     sample_count: int,
     score_mode: str,
     generation_settings: Mapping[str, Any],
+    token_resolution: str = "bare_label_exact_roundtrip_v1",
 ) -> dict[str, Any]:
     """Build the minimum identity used to key a reusable prior estimate."""
     if sample_count < 1:
         raise ValueError("sample_count must be positive")
     return {
-        "schema_version": 2,
+        "schema_version": 3,
+        "token_resolution": token_resolution,
         "backend": backend,
         "backend_version": backend_version,
         "model": model,

@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
+
+import pytest
 
 from calibrated_agency.conformance import compare_backends
 from calibrated_agency.correction import softmax
@@ -55,3 +58,42 @@ def test_backend_comparison_reports_semantic_mismatch() -> None:
     assert not report.passed
     assert report.token_id_mismatches == 1
     assert report.max_absolute_log_odds_difference > 0.09
+
+
+def test_backend_comparison_uses_action_identity_not_mapping_order() -> None:
+    first = StaticBackend({"a": 1.2, "b": -0.4}, {"a": 10, "b": 11})
+    second = StaticBackend({"b": -0.4, "a": 1.2}, {"b": 11, "a": 10})
+    assert compare_backends(
+        first,
+        second,
+        requests(),
+        prior={"a": 1, "b": 1},
+        target={"a": 1, "b": 1},
+    ).passed
+
+
+@pytest.mark.parametrize("tolerance", [math.nan, math.inf, -1])
+def test_backend_comparison_rejects_invalid_tolerance(tolerance: float) -> None:
+    backend = StaticBackend({"a": 0, "b": 0}, {"a": 10, "b": 11})
+    with pytest.raises(ValueError, match="finite and nonnegative"):
+        compare_backends(
+            backend,
+            backend,
+            requests(),
+            prior={"a": 1, "b": 1},
+            target={"a": 1, "b": 1},
+            log_odds_tolerance=tolerance,
+        )
+
+
+def test_backend_comparison_requires_beta_comparisons() -> None:
+    backend = StaticBackend({"a": 0, "b": 0}, {"a": 10, "b": 11})
+    with pytest.raises(ValueError, match="betas"):
+        compare_backends(
+            backend,
+            backend,
+            requests(),
+            prior={"a": 1, "b": 1},
+            target={"a": 1, "b": 1},
+            betas=[],
+        )

@@ -1,153 +1,142 @@
 # calibrated-agency
 
-Bayesian calibration of discrete language-model actions while retaining measurable
-contextual variation.
+`calibrated-agency` adjusts a language model's action scores using an estimated model prior
+and target action rates. It implements the Bayesian logit correction from
+[Calibrated but Autonomous](https://openreview.net/forum?id=9EZgvMOHXn).
 
-> **Alpha:** the mathematical core is backend-independent. The first tested serving target
-> is vLLM 0.26. The vLLM processor interface is version-pinned because upstream marks it as
-> evolving.
-
-## What the method does
-
-For action `a` in context `x`, the paper-style correction is
-
-```text
-corrected_score(a, x)
-  = beta * (raw_score(a, x) - log(model_prior(a)))
-    + log(target_rate(a))
-```
-
-The corrected scores are normalized and sampled over the declared finite action set.
-
-- `beta = 0` samples the target distribution exactly.
-- `beta > 0` retains context-dependent model variation.
-- Between any two contexts, each pairwise action log-odds difference is scaled exactly by
-  `beta`, provided the prompt, labels, and prior are held fixed.
-- For `beta > 0`, the closed form does **not** generally guarantee that the marginal action
-  rate remains exactly equal to the target. It is an anchor, not a hard constraint.
-
-The project calls this property **calibrated context-responsiveness**. It does not equate a
-logit-level property with philosophical or behavioral autonomy.
-
-## Implementations
-
-- **Core:** dependency-free correction, prior estimation, exact seeded sampling, cache
-  fingerprints, and an optional exact marginal-intercept fitter.
-- **vLLM native:** a vLLM V1 batch logits processor supporting the paper-style trigger and a
-  simpler first-generated-token mode.
-- **vLLM API:** exact single-token scoring with the vLLM-specific `allowed_token_ids` and
-  `logprob_token_ids` fields against a server configured with raw logprobs.
-- **Transformers native:** direct next-token scoring and a first-token Transformers
-  `LogitsProcessor`.
-
-These are backend-specific adapters. The project does not claim generic
-“OpenAI-compatible” support.
+The core needs Python 3.10 or later and has no runtime dependencies. Optional adapters
+support vLLM and Transformers. Version `0.2.0a1` is an alpha; it is not published on PyPI.
 
 ## Install
-
-Core only:
-
-```bash
-pip install calibrated-agency
-```
 
 From a checkout:
 
 ```bash
-uv sync --group dev
+pip install .
 ```
 
-Optional runtimes:
+For an optional model runtime, use `pip install '.[vllm]'`,
+`pip install '.[transformers]'`, or `pip install '.[all]'`. The combined extra lets vLLM
+select its required PyTorch build. Runtime versions are pinned in `pyproject.toml`.
 
-```bash
-pip install 'calibrated-agency[transformers]'
-pip install 'calibrated-agency[vllm]'
-```
-
-The combined environment lets vLLM supply its exact PyTorch build:
-
-```bash
-pip install 'calibrated-agency[all]'
-```
-
-## Core example
+## Choose an action
 
 ```python
+import random
+
 from calibrated_agency import bayesian_correct, decide
 
-raw_scores = {"post": 1.7, "comment": 0.2}
-model_prior = {"post": 0.65, "comment": 0.35}
+scores = {"post": 1.7, "comment": 0.2}
+prior = {"post": 0.65, "comment": 0.35}
 target = {"post": 0.10, "comment": 0.90}
+rng = random.Random(7)
 
-corrected = bayesian_correct(raw_scores, model_prior, target, beta=0.15)
-choice = decide(raw_scores, model_prior, target, beta=0.15, seed=7)
+probabilities = bayesian_correct(scores, prior, target, beta=0.15).probabilities
+choice = decide(scores, prior, target, beta=0.15, rng=rng)
 
-print(corrected.probabilities)
+print(probabilities)
 print(choice.action)
 ```
 
-See [`examples/synthetic_binary.py`](examples/synthetic_binary.py) for a reproducible
-simulation and exact-marginal comparison.
+Keep the same `rng` across decisions to continue its random sequence. For a single
+reproducible call, use `seed=7` instead. Supplying both arguments is an error.
 
-## Endpoint requirements
+## The correction
 
-The vLLM API fast path requires each action label to be a distinct single token at the
-**rendered generation boundary**. It deliberately fails closed when this cannot be verified.
-Run the server with an explicit score mode:
+For action `a` in context `x`:
+
+```text
+score(a, x) = beta * (raw_score(a, x) - log(prior(a))) + log(target(a))
+probability(a | x) = softmax(score(a, x))
+```
+
+`beta` must lie between zero and one. At zero, the action probabilities equal the
+normalized target in every context. Positive beta retains some of the model's response to
+context: differences in pairwise log odds between contexts are multiplied by beta.
+
+At positive beta, average action probabilities generally differ from the target.
+`fit_marginal_intercepts` is a separate option that matches the target on a supplied
+calibration sample. That match need not hold on new contexts.
+
+Use `bayesian_correct_log` when priors and targets are already logged. It accepts finite
+log weights without converting them to probabilities first. Priors and targets must be
+positive; the application decides how to handle zero target rates.
+
+The [synthetic example](examples/synthetic_binary.py) compares the two correction methods:
+
+```bash
+uv run python examples/synthetic_binary.py
+```
+
+## Model adapters
+
+| Adapter | What it does |
+|---|---|
+| vLLM API | Retrieves all candidate scores, then corrects and samples in Python |
+| vLLM native | Applies correction in a vLLM V1 logits processor |
+| Transformers native | Scores the next token directly or applies a first-token processor |
+
+Each action label must encode to one distinct token and decode exactly to the same label.
+Multi-token labels are not supported. The HTTP adapter needs specific vLLM features;
+a generic OpenAI-compatible endpoint is insufficient.
+
+For the API adapter, start vLLM with:
 
 ```bash
 vllm serve MODEL --logprobs-mode raw_logprobs --generation-config vllm
 ```
 
-The adapter generates one constrained token, retrieves every requested candidate score by
-ID, applies the correction in the client, and samples with a client-side seeded RNG.
-Server-selected labels are not used to estimate priors.
+The adapter checks tokenization against the prompt IDs and counts returned by generation.
+It requires `/tokenize`, `/detokenize`, and assistant-message continuation, and disables
+thinking at the action boundary. See [backend setup](docs/backends.md) for the full contract.
 
-## Priors
+Applications can supply their own scorer through `ActionScorer` or `AsyncActionScorer`.
+These interfaces use the same request and result types. The application keeps control of
+context construction, timeouts, retries, caching, and action execution.
 
-For endpoint and direct-scoring backends, prefer the probability-mean prior: normalize the
-candidate scores for each representative historical context, then average those
-probabilities. This uses more information and less sampling noise than counting one sampled
-label per context.
+## Calibration
 
-The sampled-count estimator with additive smoothing remains available to reproduce the
-paper protocol.
+Estimate the prior from contexts that represent the population you intend to simulate.
+`probability_mean_prior` averages the full action distributions. `counted_prior` estimates
+frequencies from sampled actions with additive smoothing, matching the original paper's
+protocol.
 
-A reusable prior must be keyed by the full scoring identity: model and tokenizer revisions,
-chat-template and prompt hashes, action labels/order/token IDs, menu, context dataset,
-estimator settings (including pseudocounts and context/sampling seeds), score mode, backend
-version, and generation settings.
+Reusing a prior requires the same model, tokenizer, prompt, action vocabulary, and scoring
+settings. The package provides fingerprint helpers; it does not manage a persistent cache.
+See [the method](docs/method.md) for numerical details and assumptions.
 
-## Validation
+## Development and tests
 
 ```bash
-uv run pytest
+uv sync --group dev
 uv run pytest --cov
 uv run ruff check .
 uv run mypy
+uv build
 ```
 
-Live parity scripts compare pairwise candidate log odds rather than absolute logits, because
-additive constants are irrelevant and kernels may differ numerically. On two A100s, the
-vLLM API and vLLM native implementations agreed within `3.3e-7` log odds for Qwen3.5-4B and
-`1.8e-7` for Llama-3.1-8B. Both native processors matched the shared correction within
-`5.3e-7`. Cross-runtime vLLM/Transformers raw-score parity failed the deliberately stricter
-tolerance, so identical trajectories across those runtimes are not claimed. See
-[`docs/validation.md`](docs/validation.md) and the
-[retained report](validation/gsc-2026-08-05/README.md).
+The current package passed 104 tests on Python 3.10, 3.12, and 3.14, with 93.44% core
+branch coverage. The wheel was also tested in a fresh environment.
 
-No historical social-media data is distributed. Examples and unit tests are synthetic.
+[Earlier GPU runs](validation/gsc-2026-08-05/README.md) tested version 0.1.0 on Qwen3.5-4B
+and Llama-3.1-8B. vLLM API/native scores agreed within the chosen tolerances;
+vLLM/Transformers scores did not. Those results do not validate the updated adapters in
+0.2.0a1. Fresh model tests remain pending.
 
-## Documentation
+See [validation](docs/validation.md), [CPU results](validation/cpu-2026-10-14/README.md),
+and [DeSiRe integration](docs/project-alignment.md) for the tested scope and remaining work.
+Examples and tests use synthetic data.
 
-- [Method, guarantees, and limits](docs/method.md)
-- [Calibration and “autonomy”](docs/autonomy.md)
-- [Backend contracts](docs/backends.md)
-- [Validation protocol](docs/validation.md)
-- [References and provenance](docs/references.md)
+## Further reading
+
+- [Method and numerical behavior](docs/method.md)
+- [Calibration and context dependence](docs/autonomy.md)
+- [Backend setup](docs/backends.md)
+- [References](docs/references.md)
+- [Changelog](CHANGELOG.md)
 - [Contributing](CONTRIBUTING.md)
 - [Security](SECURITY.md)
 
 ## License
 
-Apache License 2.0. See [`LICENSE`](LICENSE).
+Apache License 2.0. See [LICENSE](LICENSE).

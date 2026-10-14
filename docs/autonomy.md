@@ -1,59 +1,33 @@
-# Calibration and “autonomy”
+# Calibration and context dependence
 
-“Autonomy” is too broad to infer from an action-rate metric. This project separates three
-claims.
+Matching action rates does not establish that an agent behaves autonomously. The correction
+controls action probabilities. Its effect on useful behavior needs separate evaluation.
 
-## 1. Marginal calibration
+## Action rates
 
-Does the expected frequency of each action match a declared target?
+At beta zero, expected action probabilities equal the normalized target. At positive beta,
+the closed form generally misses that target. Fitted intercepts match it on the calibration
+sample, but may miss it on new data.
 
-- The closed form guarantees this at beta zero.
-- At positive beta it usually approximates rather than guarantees the target.
-- Fitted marginal intercepts guarantee it on the calibration-context sample.
+Report expected probabilities alongside sampled frequencies. A finite run has sampling
+noise even when its underlying probabilities are correctly calibrated.
 
-Report expected probabilities as well as sampled frequencies. A finite run adds sampling
-noise that should not be mistaken for calibration error.
+## Responses to context
 
-## 2. Context-responsiveness
+The correction multiplies between-context differences in pairwise action log odds by beta.
+For example, beta 0.15 retains 15% of the model's original difference in log odds between
+two contexts, provided the prior, target, and action vocabulary stay fixed.
 
-Does the agent alter its action propensity across contexts?
+This property says how much variation remains, not whether that variation is useful.
+Models can respond to relevant evidence, irrelevant wording, stereotypes, or formatting.
+A useful evaluation distinguishes these responses with controlled changes to the context.
 
-The closed form retains a beta fraction of the model's between-context pairwise log-odds
-variation. This is a mathematical property, not a judgment that the variation is useful.
-At beta 0.15, for example, only 15% of that log-odds variation remains.
+Possible measurements include variation in prior-centered log odds, agreement in the
+ranking of contexts, and sensitivity to relevant versus irrelevant changes. Aggregate action
+rates alone cannot show whether decisions respond sensibly to context.
 
-Useful measurements include:
+## Behavior
 
-- variance of prior-centered pairwise log odds;
-- rank correlation across contexts;
-- sign agreement of contextual deviations;
-- sensitivity to controlled, causally relevant context changes;
-- insensitivity to paraphrases and irrelevant changes.
-
-Comparing only final marginal action rates cannot establish context-responsiveness. A strong
-target anchor can make two behaviorally different scoring protocols look similar in the
-aggregate.
-
-## 3. Behavioral agency
-
-Does the generated action serve coherent goals, respond to relevant evidence, and remain
-stable under harmless prompt changes?
-
-That requires task-specific evaluation. The correction can preserve model variation caused
-by prompt artifacts or bias just as readily as variation caused by sound reasoning. Content
-quality, long-horizon planning, user-specific fidelity, and downstream consequences are
-outside the formula's guarantee.
-
-## Recommended language
-
-Prefer:
-
-> The policy calibrates discrete action rates while retaining a controlled amount of the
-> model's context-dependent action signal.
-
-Avoid:
-
-> The policy guarantees autonomous behavior.
-
-A beta value is a transparent control over one operational dimension of agency. It is not a
-scalar measurement of autonomy in general.
+Coherent goals, persona fidelity, content quality, and behavior over time require their own
+measurements. The formula does not guarantee any of them. Describe beta as a control over
+context-dependent action probabilities rather than a general measure of autonomy.

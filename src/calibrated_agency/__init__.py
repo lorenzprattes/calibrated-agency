@@ -1,11 +1,15 @@
 """Calibrated discrete action selection for language-model agents."""
 
+from .backends.base import ActionScorer, AsyncActionScorer
 from .correction import (
     CorrectionResult,
     bayesian_correct,
+    bayesian_correct_log,
     contextual_log_odds,
     decide,
     expected_action_rates,
+    log_normalize_weights,
+    log_softmax,
     pairwise_log_odds,
     sample_probabilities,
     softmax,
@@ -28,7 +32,9 @@ from .schemas import (
 )
 
 __all__ = [
+    "ActionScorer",
     "ActionSpace",
+    "AsyncActionScorer",
     "Candidate",
     "ChatMessage",
     "CorrectionResult",
@@ -39,15 +45,18 @@ __all__ = [
     "ScoredDecision",
     "apply_intercepts",
     "bayesian_correct",
+    "bayesian_correct_log",
     "contextual_log_odds",
     "counted_prior",
     "decide",
     "expected_action_rates",
     "fit_marginal_intercepts",
+    "log_normalize_weights",
+    "log_softmax",
     "pairwise_log_odds",
     "probability_mean_prior",
     "sample_probabilities",
     "softmax",
 ]
 
-__version__ = "0.1.0"
+__version__ = "0.2.0a1"

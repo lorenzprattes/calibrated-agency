@@ -24,7 +24,7 @@ class ParityReport:
 
 
 def _pairwise_differences(result: ScoreResult) -> dict[tuple[str, str], float]:
-    actions = tuple(result.raw_scores)
+    actions = tuple(sorted(result.raw_scores))
     return {
         (first, second): result.raw_scores[first] - result.raw_scores[second]
         for first, second in itertools.combinations(actions, 2)
@@ -45,8 +45,13 @@ def compare_backends(
     """Compare backend-invariant score differences and corrected probabilities."""
     if not requests:
         raise ValueError("at least one score request is required")
-    if log_odds_tolerance < 0 or probability_tolerance < 0:
-        raise ValueError("tolerances must be nonnegative")
+    if any(
+        not math.isfinite(value) or value < 0
+        for value in (log_odds_tolerance, probability_tolerance)
+    ):
+        raise ValueError("tolerances must be finite and nonnegative")
+    if not betas or any(not math.isfinite(beta) or not 0 <= beta <= 1 for beta in betas):
+        raise ValueError("betas must be nonempty, finite, and in [0, 1]")
     absolute_log_odds_differences: list[float] = []
     max_probability_difference = 0.0
     token_id_mismatches = 0
@@ -54,6 +59,11 @@ def compare_backends(
     for request in requests:
         first_result = first.score(request)
         second_result = second.score(request)
+        if any(
+            set(result.raw_scores) != set(request.action_space.actions)
+            for result in (first_result, second_result)
+        ):
+            raise ValueError("backend returned actions different from the requested action set")
         first_odds = _pairwise_differences(first_result)
         second_odds = _pairwise_differences(second_result)
         if set(first_odds) != set(second_odds):
@@ -68,15 +78,12 @@ def compare_backends(
             second_corrected = bayesian_correct(second_result.raw_scores, prior, target, beta)
             for action in first_corrected.probabilities:
                 difference = abs(
-                    first_corrected.probabilities[action]
-                    - second_corrected.probabilities[action]
+                    first_corrected.probabilities[action] - second_corrected.probabilities[action]
                 )
                 max_probability_difference = max(max_probability_difference, difference)
 
     max_log_odds = max(absolute_log_odds_differences)
-    mean_log_odds = math.fsum(absolute_log_odds_differences) / len(
-        absolute_log_odds_differences
-    )
+    mean_log_odds = math.fsum(absolute_log_odds_differences) / len(absolute_log_odds_differences)
     passed = (
         max_log_odds <= log_odds_tolerance
         and max_probability_difference <= probability_tolerance

@@ -7,7 +7,12 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from types import MappingProxyType
 
-from .correction import expected_action_rates, normalize_probabilities, softmax
+from .correction import (
+    log_normalize_weights,
+    log_softmax,
+    normalize_probabilities,
+    softmax,
+)
 
 
 @dataclass(frozen=True)
@@ -43,9 +48,11 @@ def probability_mean_prior(
     for distribution in distributions:
         if set(distribution) != set(actions):
             raise ValueError("all prior distributions must use the same actions")
-        normalized = normalize_probabilities(distribution)
+        normalized = normalize_probabilities(distribution, allow_zero=True)
         for action in actions:
             totals[action] += normalized[action]
+    if any(value == 0 for value in totals.values()):
+        raise ValueError("zero prior mass requires a positive pseudocount")
     return normalize_probabilities(totals)
 
 
@@ -79,6 +86,8 @@ def apply_intercepts(
         raise ValueError("beta must be finite and in [0, 1]")
     if set(raw_scores) != set(intercepts):
         raise ValueError("raw score and intercept actions must match")
+    if any(not math.isfinite(value) for value in (*raw_scores.values(), *intercepts.values())):
+        raise ValueError("raw scores and intercepts must be finite")
     return softmax(
         {action: beta * raw_scores[action] + intercepts[action] for action in raw_scores}
     )
@@ -107,10 +116,11 @@ def fit_marginal_intercepts(
         raise ValueError("beta must be finite and in [0, 1]")
     if not math.isfinite(tolerance) or tolerance <= 0:
         raise ValueError("tolerance must be finite and positive")
-    if max_iterations < 1:
-        raise ValueError("max_iterations must be positive")
+    if type(max_iterations) is not int or max_iterations < 1:
+        raise ValueError("max_iterations must be a positive integer")
 
-    normalized_target = normalize_probabilities(target)
+    log_target = log_normalize_weights(target)
+    normalized_target = {action: math.exp(value) for action, value in log_target.items()}
     actions = tuple(normalized_target)
     for scores in context_scores:
         if set(scores) != set(actions):
@@ -118,19 +128,31 @@ def fit_marginal_intercepts(
         if any(not math.isfinite(value) for value in scores.values()):
             raise ValueError("context scores must be finite")
 
-    intercepts = {action: math.log(normalized_target[action]) for action in actions}
+    intercepts = dict(log_target)
     achieved: dict[str, float] = {}
     error = math.inf
     for iteration in range(max_iterations + 1):
-        distributions = [apply_intercepts(scores, intercepts, beta) for scores in context_scores]
-        achieved = expected_action_rates(distributions)
+        log_distributions = [
+            log_softmax({action: beta * scores[action] + intercepts[action] for action in actions})
+            for scores in context_scores
+        ]
+        log_achieved: dict[str, float] = {}
+        for action in actions:
+            values = [distribution[action] for distribution in log_distributions]
+            peak = max(values)
+            log_achieved[action] = (
+                peak
+                + math.log(math.fsum(math.exp(value - peak) for value in values))
+                - math.log(len(values))
+            )
+        achieved = {action: math.exp(value) for action, value in log_achieved.items()}
         error = max(abs(achieved[action] - normalized_target[action]) for action in actions)
         if error <= tolerance:
             return MarginalFit(intercepts, achieved, iteration, error)
         if iteration == max_iterations:
             break
         for action in actions:
-            intercepts[action] += math.log(normalized_target[action]) - math.log(achieved[action])
+            intercepts[action] += log_target[action] - log_achieved[action]
         reference = intercepts[actions[-1]]
         intercepts = {action: value - reference for action, value in intercepts.items()}
 

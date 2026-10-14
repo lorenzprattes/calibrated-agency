@@ -1,20 +1,14 @@
-# Security policy
+# Security
 
-## Reporting
+Contact the repository owner privately to report a vulnerability. Do not put API keys,
+private prompts, or working exploit details in a public issue.
 
-Until a public maintainer address is designated, report vulnerabilities privately to the
-repository owner rather than opening a public issue containing exploit details or secrets.
+Model adapters send prompts to the endpoint configured by the caller. The application is
+responsible for endpoint access, transport security, and data retention.
 
-## Scope
+The package rejects missing or nonfinite scores, conflicting candidate scores, duplicate
+token IDs, and unsupported labels. The API adapter also checks that generation used the
+same prompt tokens as tokenization.
 
-Backend adapters send prompts and model outputs to configured inference services. Operators
-are responsible for endpoint access controls, transport security, retention, and data-use
-policies. Do not send sensitive prompts to an endpoint whose operator or logging policy is
-unknown.
-
-The package treats model and endpoint responses as untrusted. Missing scores, malformed
-responses, duplicate token IDs, unsupported token boundaries, and unknown score modes must
-fail closed.
-
-Never include API keys in cache identities, logs, fixtures, or bug reports. Use environment
-variables or an external credential provider.
+Keep credentials out of cache identities, logs, and test fixtures. Supply them through
+an environment variable or an external credential provider.

@@ -1,6 +1,6 @@
 # Contributing
 
-## Development setup
+## Setup
 
 ```bash
 uv sync --group dev
@@ -10,29 +10,25 @@ uv run mypy
 uv build
 ```
 
-Keep the dependency-free mathematical core separate from optional serving runtimes. A new
-backend must fail closed when score semantics or token boundaries are unknown.
+Keep the core independent of model runtimes. Backend dependencies belong in optional extras.
+Errors in scores or tokenization should raise an exception rather than silently change the
+sampling method.
 
-## Changes to the method
+## Changes to the correction
 
-A change to correction order, normalization, prior estimation, temperature handling, or
-candidate scoring is a methodological change, not a refactor. Include:
+Changes to normalization, prior estimation, temperature handling, or candidate scoring can
+change the method's behavior. Explain the formula and add a focused regression test, including
+the effects at beta zero and one. Record changes to the guarantees in the method documentation.
+Run a live comparison when a change depends on model-runtime behavior, or state that it remains
+untested. Keep the existing thresholds when reporting results.
 
-- the mathematical definition;
-- a regression/property test;
-- expected effects at beta 0 and 1;
-- a live backend parity test when applicable;
-- documentation of any changed guarantee.
+## Examples and data
 
-Do not weaken validation or insert silent fallbacks to make an unsupported endpoint appear
-compatible.
-
-## Data and examples
-
-Do not add scraped, personal, licensed, or model-generated data without documenting its
-source and redistribution terms. Synthetic fixtures are preferred for package tests.
+Use synthetic fixtures where possible. Document the source and redistribution terms of any
+external data added to the repository.
 
 ## Pull requests
 
-Keep changes focused. Report the commands run and their results. GPU results must include the
-model revision, runtime versions, hardware, seeds, and retained machine-readable output.
+Describe the problem, the change, and the checks you ran. For GPU results, record model and
+runtime versions, hardware, seeds, and machine-readable output so another developer can
+repeat the run.

@@ -1,61 +1,67 @@
-# Backend contracts
+# Model backends
 
-## Common contract
+Every scorer returns all candidate scores at the same next-token position, their token IDs,
+and probabilities normalized over the candidate set. These are probabilities conditional
+on choosing one of the listed actions, not full-vocabulary probabilities.
 
-A scorer must return, at one exact autoregressive boundary:
+Labels are encoded on their own, without special tokens. Each must produce one distinct
+token ID and decode exactly to the label. The prompt prefix is rendered separately.
+Encoding the prefix and label together can merge tokens, but generation cannot change
+prefix tokens it has already emitted.
 
-- every candidate's token ID;
-- every candidate's raw model score;
-- the probabilities obtained by renormalizing those scores over the declared candidate set;
-- model/backend provenance.
-
-The normalized candidate probabilities are conditional on choosing from the candidate set.
-They are not unconditional full-vocabulary probabilities.
-
-Labels must be distinct single tokens at the rendered boundary. Encoding each label in
-isolation is not sufficient: byte-pair tokenization can merge across the prefix boundary.
+`ActionScorer` defines synchronous `score(request)` and `AsyncActionScorer` defines its
+asynchronous equivalent. Both take `ScoreRequest` and return `ScoreResult`. The async
+protocol is a typing interface, not an HTTP client. Applications supply context fitting,
+timeouts, cancellation, retries, and caching.
 
 ## vLLM API
 
-Supported deployment profile:
+The HTTP adapter is written for vLLM `0.26.*`. Start the server with
+`--logprobs-mode raw_logprobs` or `raw_logits` and `--generation-config vllm`.
+The adapter needs `/tokenize`, `/detokenize`, assistant-message continuation, and generation
+responses containing prompt token IDs and counts. It supports at most 128 action tokens.
+Thinking is disabled at the API action boundary. Speculative decoding is unsupported.
 
-- vLLM `0.26.*`;
-- server started with `--logprobs-mode raw_logprobs` (recommended) or `raw_logits`,
-  plus `--generation-config vllm` to avoid inherited model-card sampling filters;
-- no speculative decoding;
-- no penalties, top-k, top-p, or logit bias in the score request;
-- at most 128 candidate token IDs.
-
-The adapter uses:
+A score request includes:
 
 ```json
 {
   "max_tokens": 1,
   "temperature": 1.0,
+  "top_p": 1.0,
   "allowed_token_ids": [101, 102],
   "logprobs": true,
   "logprob_token_ids": [101, 102],
-  "return_tokens_as_token_ids": true
+  "return_tokens_as_token_ids": true,
+  "return_token_ids": true
 }
 ```
 
-The score mode is configured server-wide and cannot be selected per request. The backend
-therefore requires an explicit caller attestation and records it in every result. A public
-endpoint that does not disclose its mode is not a supported deployment.
+The adapter also disables top-k, min-p, repetition, frequency, and presence penalties for
+scoring. The caller must declare the server's raw score mode: the adapter records it but
+cannot select or verify it through the request.
 
-`score()` returns the server's constrained but uncorrected sample in
-`ScoreResult.selected_action` for diagnostics. `decide()` ignores that sample, applies the
-formula to the returned raw scores, and samples with its own seeded RNG; it returns both the
-score response and corrected decision.
+Before scoring or continuation, the adapter tokenizes the exact message and template settings
+with `add_special_tokens=false`. Returned `prompt_token_ids` and `usage.prompt_tokens`
+must match this result. Missing or changed metadata raises an error. The adapter does not
+check context limits or shrink prompts.
 
-Chat continuation resends and re-renders the complete history; vLLM does not provide a
-persistent conversation handle. For strict token-level continuation, prefer the completions
-endpoint with integer prompt IDs. Chat prefill using `continue_final_message` needs a live
-model-specific conformance test.
+`score()` records the server's uncorrected sample in `ScoreResult.selected_action`.
+`decide()` uses the returned scores to sample a corrected action in Python. All result maps
+follow the requested action order, so the server sample and response ordering cannot change
+the client choice for a fixed seed.
+
+Use `decide(..., rng=task_rng)` for a continuing client random sequence. Supplying both
+`rng` and `seed` raises an error before making a request. If neither is supplied, the
+client uses the request seed. Native engine sampling has its own seed semantics.
+
+Chat continuation resends and re-renders the history. Check assistant prefill and parsed
+continuations on the model you intend to use. For token-ID continuation, use a transport
+that sends integer prompt IDs through the completions endpoint.
 
 ## vLLM native
 
-Register the processor when constructing `LLM`:
+Register the processor when constructing the model:
 
 ```python
 from vllm import LLM
@@ -69,48 +75,42 @@ llm = LLM(
 )
 ```
 
-Per-request configuration is passed through `SamplingParams.extra_args`, built by
-`make_vllm_extra_args`.
+`make_vllm_extra_args` builds the per-request configuration for
+`SamplingParams.extra_args`. Choose one activation mode:
 
-Two activation modes are available:
+- `apply_at_first_token=True` for a prompt already ending at the action boundary;
+- `trigger_token_ids=[...]` for generation that reaches an action tag during the response.
 
-- `apply_at_first_token=True`, for a prompt prefilled to the action boundary;
-- `trigger_token_ids=[...]`, for paper-style one-pass generation that reaches an action tag.
-
-Exactly one mode is required. The processor masks all other vocabulary entries only at the
-activation step. It is not argmax-invariant and is incompatible with vLLM 0.26 speculative
+The processor corrects action logits and masks other vocabulary entries at that position
+only. It can change the highest-scoring token and is incompatible with vLLM 0.26 speculative
 decoding.
 
-The processor compensates for vLLM's later temperature division. Disable compensation only
-when intentionally reproducing an implementation that did not account for processor order.
+Temperature compensation accounts for the runtime's later division by temperature.
+Disable it only when deliberately reproducing uncorrected temperature handling.
+`decide_native()` requires a finite positive temperature. The lower-level processor can
+transform logits for greedy decoding, but those choices do not sample its softmax.
 
 ## Transformers native
 
-`TransformersNativeBackend.score` renders the chat template and executes a direct forward
-pass. This is the simplest way to obtain raw next-token logits.
+`TransformersNativeBackend.score` renders the chat template and obtains raw next-token logits
+from a direct forward pass.
 
-`FirstTokenBayesianLogitsProcessor` records the initial prompt width, applies the correction
-only at that first generated position, masks other tokens, and can compensate for a later
-Transformers temperature warper. `TransformersNativeBackend.decide_native` invokes it on a
-single direct forward pass, applies the declared temperature, and samples with a local
-`torch.Generator`. This deliberately bypasses checkpoint `generation_config` penalties and
-truncation filters.
+`FirstTokenBayesianLogitsProcessor` corrects the first generated position after a known
+prompt length. `decide_native` applies it to one forward pass and samples with a local
+`torch.Generator`, bypassing checkpoint generation penalties and truncation filters.
 
-The processor can be passed to `model.generate`, but callers then own the full generation
-configuration and must neutralize all inherited penalties, biases, forced/suppressed tokens,
-and truncation warpers. The first release does not support beams, per-row action sets, padded
-heterogeneous prompt lengths, or speculative decoding.
+If you use the processor with `model.generate`, configure generation explicitly. Inherited
+penalties, biases, forced or suppressed tokens, and truncation filters can alter the result.
+Beams, per-row action sets, heterogeneous padded prompt lengths, and speculative decoding
+are unsupported.
 
-## Multi-token labels
+## Multi-token labels and versions
 
-A one-token score does not represent a multi-token choice. Multi-token actions require
-teacher-forced sequence scoring along every candidate path, including careful treatment of
-shared prefixes and length normalization. That is a separate future backend contract; the
-current fast path rejects it.
+A one-token score cannot represent a multi-token action. Supporting one would require
+scoring each candidate sequence, with a rule for shared prefixes and sequence length.
+The current adapters reject such labels.
 
-## Version policy
-
-vLLM's V1 custom-processor interface is evolving, so the optional extra pins `0.26.*`.
-Transformers is constrained to the tested 5.x range compatible with vLLM 0.26. Hardware,
-PyTorch, model, tokenizer, and chat-template revisions remain part of reproducibility
-metadata.
+The vLLM extra pins `0.26.*` because its processor interface changes between versions.
+The Transformers extra uses the 5.x range selected for vLLM 0.26 compatibility. Model,
+tokenizer, chat-template, PyTorch, and hardware versions still matter when reproducing results.
+Fresh tests of the changed 0.2.0a1 adapters are pending; the retained GPU results cover 0.1.0.

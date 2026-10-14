@@ -7,6 +7,8 @@ This is deliberately a vLLM adapter, not a generic OpenAI backend. It uses vLLM-
 from __future__ import annotations
 
 import json
+import math
+import random
 import re
 import time
 import urllib.error
@@ -15,6 +17,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from calibrated_agency.backends.base import ContinuationResult
+from calibrated_agency.backends.tokenization import resolve_action_tokens
 from calibrated_agency.correction import decide as core_decide
 from calibrated_agency.correction import softmax
 from calibrated_agency.schemas import ChatMessage, ScoredDecision, ScoreRequest, ScoreResult
@@ -43,11 +46,16 @@ class VllmApiBackend:
             raise ValueError(
                 "the API backend requires an explicit raw_logprobs or raw_logits server mode"
             )
+        if not math.isfinite(timeout) or timeout <= 0:
+            raise ValueError("timeout must be finite and positive")
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.api_key = api_key
         self.logprobs_mode = logprobs_mode
         self.chat_template_kwargs = dict(chat_template_kwargs or {})
+        self.chat_template_kwargs.setdefault("enable_thinking", False)
+        if self.chat_template_kwargs["enable_thinking"] is not False:
+            raise ValueError("API action-boundary scoring requires enable_thinking=False")
         self.model = model or self._discover_model()
 
     def _request(self, path: str, payload: Mapping[str, Any] | None = None) -> dict[str, Any]:
@@ -92,13 +100,23 @@ class VllmApiBackend:
                 response = self._request(path, payload)
                 tokens = response.get("tokens", response.get("token_ids"))
                 if not isinstance(tokens, list) or not all(
-                    isinstance(token, int) for token in tokens
+                    type(token) is int and token >= 0 for token in tokens
                 ):
                     raise VllmApiError(f"{path} returned no integer token list")
                 return tokens
             except VllmApiError as exc:
                 errors.append(str(exc))
         raise VllmApiError("tokenization failed: " + " | ".join(errors))
+
+    def _encode_label(self, label: str) -> list[int]:
+        return self._tokenize({"model": self.model, "prompt": label, "add_special_tokens": False})
+
+    def _decode_label(self, token_ids: list[int]) -> str:
+        response = self._request("/detokenize", {"model": self.model, "tokens": token_ids})
+        text = response.get("prompt")
+        if not isinstance(text, str):
+            raise VllmApiError("detokenization returned no text prompt")
+        return text
 
     def _messages_payload(
         self,
@@ -127,35 +145,17 @@ class VllmApiBackend:
             "add_generation_prompt": add_generation_prompt,
             "continue_final_message": continue_final_message,
             "chat_template_kwargs": self.chat_template_kwargs,
+            "add_special_tokens": False,
         }
 
     def resolve_token_ids(self, request: ScoreRequest) -> dict[str, int]:
-        """Verify candidates at the fully rendered generation boundary."""
-        base_payload = self._messages_payload(
-            request.messages,
-            assistant_prefix=request.assistant_prefix,
-            candidate_label=None,
-        )
-        base_ids = self._tokenize(base_payload)
-        token_ids: dict[str, int] = {}
-        for candidate in request.action_space.candidates:
-            candidate_payload = self._messages_payload(
-                request.messages,
-                assistant_prefix=request.assistant_prefix,
-                candidate_label=candidate.label,
+        """Resolve bare labels without retokenizing the fixed prefix."""
+        try:
+            token_ids = resolve_action_tokens(
+                request.action_space, self._encode_label, self._decode_label
             )
-            candidate_ids = self._tokenize(candidate_payload)
-            if (
-                candidate_ids[: len(base_ids)] != base_ids
-                or len(candidate_ids) != len(base_ids) + 1
-            ):
-                raise VllmApiError(
-                    f"label {candidate.label!r} is not exactly one appended token at the "
-                    "rendered generation boundary"
-                )
-            token_ids[candidate.action] = candidate_ids[-1]
-        if len(set(token_ids.values())) != len(token_ids):
-            raise VllmApiError("candidate labels resolve to duplicate token IDs")
+        except RuntimeError as exc:
+            raise VllmApiError(str(exc)) from exc
         if len(token_ids) > 128:
             raise VllmApiError("vLLM 0.26 supports at most 128 explicit logprob token IDs")
         return token_ids
@@ -186,17 +186,23 @@ class VllmApiBackend:
     ) -> tuple[str, dict[str, float]]:
         try:
             choice = response["choices"][0]
-            first = choice["logprobs"]["content"][0]
+            positions = choice["logprobs"]["content"]
+            if not isinstance(positions, list) or len(positions) != 1:
+                raise VllmApiError("score response must contain exactly one token position")
+            first = positions[0]
         except (KeyError, IndexError, TypeError) as exc:
             raise VllmApiError("chat response contains no first-token logprobs") from exc
         if not isinstance(first, dict):
             raise VllmApiError("chat response has malformed first-token logprobs")
-        alternatives = [first, *(first.get("top_logprobs") or [])]
+        top_logprobs = first.get("top_logprobs")
+        if not isinstance(top_logprobs, list):
+            raise VllmApiError("chat response has malformed candidate alternatives")
+        alternatives = [first, *top_logprobs]
         actions_by_token_id = {token_id: action for action, token_id in token_ids.items()}
         raw_scores: dict[str, float] = {}
         for alternative in alternatives:
             if not isinstance(alternative, dict):
-                continue
+                raise VllmApiError("chat response has malformed candidate alternative")
             action = cls._label_from_serialized_token(
                 alternative.get("token"),
                 labels_by_action=labels_by_action,
@@ -204,7 +210,12 @@ class VllmApiBackend:
             )
             if action is not None:
                 try:
-                    raw_scores[action] = float(alternative["logprob"])
+                    value = alternative["logprob"]
+                    if type(value) not in {float, int} or not math.isfinite(value):
+                        raise VllmApiError("candidate score must be numeric and finite")
+                    if action in raw_scores and raw_scores[action] != value:
+                        raise VllmApiError(f"conflicting duplicate score for {action!r}")
+                    raw_scores[action] = float(value)
                 except (KeyError, TypeError, ValueError) as exc:
                     raise VllmApiError("candidate score is missing or nonnumeric") from exc
         missing = set(token_ids) - set(raw_scores)
@@ -218,7 +229,7 @@ class VllmApiBackend:
         )
         if sampled_action is None:
             raise VllmApiError("sampled token is outside the declared action set")
-        return sampled_action, raw_scores
+        return sampled_action, {action: raw_scores[action] for action in token_ids}
 
     def score(self, request: ScoreRequest) -> ScoreResult:
         token_ids = self.resolve_token_ids(request)
@@ -230,20 +241,30 @@ class VllmApiBackend:
             assistant_prefix=request.assistant_prefix,
             candidate_label=None,
         )
+        prompt_ids = self._tokenize(payload)
+        if not prompt_ids:
+            raise VllmApiError("rendered scoring prompt must not be empty")
         payload.update(
             {
                 "temperature": 1.0,
                 "top_p": 1.0,
+                "top_k": -1,
+                "min_p": 0.0,
+                "repetition_penalty": 1.0,
+                "frequency_penalty": 0.0,
+                "presence_penalty": 0.0,
                 "max_tokens": 1,
                 "logprobs": True,
                 "logprob_token_ids": list(token_ids.values()),
                 "return_tokens_as_token_ids": True,
                 "allowed_token_ids": list(token_ids.values()),
                 "seed": request.seed,
+                "return_token_ids": True,
             }
         )
         started = time.monotonic()
         response = self._request("/v1/chat/completions", payload)
+        self._require_prompt_parity(response, prompt_ids)
         latency = time.monotonic() - started
         selected_action, raw_scores = self._parse_score_response(
             response, labels_by_action=labels_by_action, token_ids=token_ids
@@ -259,9 +280,28 @@ class VllmApiBackend:
                 "declared_logprobs_mode": self.logprobs_mode,
                 "latency_seconds": latency,
                 "selected_action_semantics": "uncorrected_server_sample_ignored_by_decide",
+                "token_resolution": "bare_label_exact_roundtrip_v1",
+                "prompt_token_ids": prompt_ids,
             },
             raw_response=response,
         )
+
+    @staticmethod
+    def _require_prompt_parity(response: Mapping[str, Any], prompt_ids: list[int]) -> None:
+        received = response.get("prompt_token_ids")
+        if (
+            not isinstance(received, list)
+            or any(type(value) is not int or value < 0 for value in received)
+            or received != prompt_ids
+        ):
+            raise VllmApiError("generation prompt token IDs differ from tokenization preflight")
+        usage = response.get("usage")
+        if (
+            not isinstance(usage, dict)
+            or type(usage.get("prompt_tokens")) is not int
+            or usage["prompt_tokens"] != len(prompt_ids)
+        ):
+            raise VllmApiError("generation prompt token count differs from tokenization preflight")
 
     def decide(
         self,
@@ -271,15 +311,19 @@ class VllmApiBackend:
         target: Mapping[str, float],
         beta: float,
         seed: int | None = None,
+        rng: random.Random | None = None,
     ) -> ScoredDecision:
         """Score through vLLM, then sample the corrected policy client-side."""
+        if seed is not None and rng is not None:
+            raise ValueError("provide at most one of seed or rng")
         score = self.score(request)
         decision = core_decide(
             score.raw_scores,
             prior,
             target,
             beta,
-            seed=request.seed if seed is None else seed,
+            seed=(request.seed if seed is None else seed) if rng is None else None,
+            rng=rng,
         )
         return ScoredDecision(score, decision)
 
@@ -292,24 +336,29 @@ class VllmApiBackend:
         max_tokens: int = 512,
         temperature: float = 0.7,
     ) -> ContinuationResult:
+        if not messages:
+            raise ValueError("continuation requires at least one message")
         if not assistant_prefix:
             raise ValueError("assistant_prefix must not be empty")
-        if max_tokens < 1:
-            raise ValueError("max_tokens must be positive")
-        if temperature < 0:
-            raise ValueError("temperature must be nonnegative")
+        if type(max_tokens) is not int or max_tokens < 1:
+            raise ValueError("max_tokens must be a positive integer")
+        if not math.isfinite(temperature) or temperature < 0:
+            raise ValueError("temperature must be finite and nonnegative")
         payload = self._messages_payload(
             messages, assistant_prefix=assistant_prefix, candidate_label=None
         )
+        prompt_ids = self._tokenize(payload)
         payload.update(
             {
                 "temperature": temperature,
                 "max_tokens": max_tokens,
                 "seed": seed,
+                "return_token_ids": True,
             }
         )
         started = time.monotonic()
         response = self._request("/v1/chat/completions", payload)
+        self._require_prompt_parity(response, prompt_ids)
         latency = time.monotonic() - started
         try:
             choice = response["choices"][0]

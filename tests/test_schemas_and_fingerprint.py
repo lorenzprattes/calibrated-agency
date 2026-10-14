@@ -50,11 +50,16 @@ def test_action_space_rejects_invalid_candidates_and_lookups() -> None:
 def test_score_result_is_validated_and_immutable() -> None:
     result = ScoreResult(
         raw_scores={"a": 0.0, "b": -1.0},
-        probabilities={"a": 0.7, "b": 0.3},
+        probabilities={
+            "a": math.exp(0) / (1 + math.exp(-1)),
+            "b": math.exp(-1) / (1 + math.exp(-1)),
+        },
         token_ids={"a": 1, "b": 2},
     )
     with pytest.raises(TypeError):
         result.raw_scores["a"] = 4.0  # type: ignore[index]
+    # Frozen result maps are mapping proxies; fingerprinting must not deepcopy them.
+    assert len(fingerprint(result)) == 64
     with pytest.raises(ValueError, match="sum"):
         ScoreResult(
             raw_scores={"a": 0.0, "b": -1.0},
@@ -127,9 +132,7 @@ def test_prior_cache_identity_changes_on_menu_or_temperature() -> None:
         generation_settings={"temperature": 1.0},
     )
     first = prior_cache_identity(**base)
-    changed = prior_cache_identity(
-        **{**base, "generation_settings": {"temperature": 0.7}}
-    )
+    changed = prior_cache_identity(**{**base, "generation_settings": {"temperature": 0.7}})
     assert fingerprint(first) != fingerprint(changed)
     changed_estimator = prior_cache_identity(
         **{

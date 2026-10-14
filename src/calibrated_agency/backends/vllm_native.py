@@ -13,7 +13,8 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from calibrated_agency.correction import bayesian_correct, normalize_probabilities, softmax
+from calibrated_agency.backends.tokenization import resolve_action_tokens
+from calibrated_agency.correction import bayesian_correct, log_normalize_weights, softmax
 from calibrated_agency.schemas import ChatMessage, ScoreRequest, ScoreResult
 
 if TYPE_CHECKING:
@@ -119,12 +120,12 @@ def make_vllm_extra_args(
     """
     if set(action_token_ids) != set(prior) or set(action_token_ids) != set(target):
         raise ValueError("action token, prior, and target keys must match")
-    normalized_prior = normalize_probabilities(prior)
-    normalized_target = normalize_probabilities(target)
+    log_prior = log_normalize_weights(prior)
+    log_target = log_normalize_weights(target)
     config = {
         "action_token_ids": dict(action_token_ids),
-        "log_prior": {action: math.log(value) for action, value in normalized_prior.items()},
-        "log_target": {action: math.log(value) for action, value in normalized_target.items()},
+        "log_prior": log_prior,
+        "log_target": log_target,
         "beta": beta,
         "trigger_token_ids": list(trigger_token_ids or []),
         "apply_at_first_token": apply_at_first_token,
@@ -221,9 +222,7 @@ class BayesianActionLogitsProcessor(LogitsProcessor):
         for index in batch_update.removed:
             self.requests.pop(index, None)
         for index, params, prompt_token_ids, output_token_ids in batch_update.added:
-            state = _RequestState.from_sampling_params(
-                params, prompt_token_ids, output_token_ids
-            )
+            state = _RequestState.from_sampling_params(params, prompt_token_ids, output_token_ids)
             if state is None:
                 self.requests.pop(index, None)
             else:
@@ -253,10 +252,10 @@ class BayesianActionLogitsProcessor(LogitsProcessor):
                 for action in state.action_token_ids
             }
             scale = (
-                state.temperature
-                if state.compensate_temperature and state.temperature > 0
-                else 1.0
+                state.temperature if state.compensate_temperature and state.temperature > 0 else 1.0
             )
+            if any(not math.isfinite(value * scale) for value in corrected.values()):
+                raise RuntimeError("corrected logits exceed floating-point capacity")
             logits[batch_index].fill_(float("-inf"))
             for action, token_id in state.action_token_ids.items():
                 logits[batch_index, token_id] = scale * corrected[action]
@@ -350,7 +349,7 @@ class VllmNativeBackend:
         if hasattr(token_ids, "tolist"):
             token_ids = token_ids.tolist()
         if not isinstance(token_ids, list) or not all(
-            isinstance(value, int) for value in token_ids
+            type(value) is int and value >= 0 for value in token_ids
         ):
             raise RuntimeError("chat template did not return a flat integer token list")
         return token_ids
@@ -361,23 +360,11 @@ class VllmNativeBackend:
             assistant_prefix=request.assistant_prefix,
             candidate_label=None,
         )
-        action_token_ids: dict[str, int] = {}
-        for candidate in request.action_space.candidates:
-            candidate_ids = self._render_ids(
-                request.messages,
-                assistant_prefix=request.assistant_prefix,
-                candidate_label=candidate.label,
-            )
-            if (
-                candidate_ids[: len(base_ids)] != base_ids
-                or len(candidate_ids) != len(base_ids) + 1
-            ):
-                raise RuntimeError(
-                    f"label {candidate.label!r} is not one appended token at the rendered boundary"
-                )
-            action_token_ids[candidate.action] = candidate_ids[-1]
-        if len(set(action_token_ids.values())) != len(action_token_ids):
-            raise RuntimeError("candidate labels resolve to duplicate token IDs")
+        action_token_ids = resolve_action_tokens(
+            request.action_space,
+            lambda label: self.tokenizer.encode(label, add_special_tokens=False),
+            lambda ids: self.tokenizer.decode(ids, skip_special_tokens=False),
+        )
         return base_ids, action_token_ids
 
     @staticmethod
@@ -463,9 +450,7 @@ class VllmNativeBackend:
             completion = output.outputs[0]
             token_id = int(completion.token_ids[0])
             raw_scores = self._extract_logprobs(completion, action_token_ids)
-            actions_by_token_id = {
-                value: action for action, value in action_token_ids.items()
-            }
+            actions_by_token_id = {value: action for action, value in action_token_ids.items()}
             if token_id not in actions_by_token_id:
                 raise RuntimeError("native processor generated a token outside the action set")
             results.append(
@@ -479,6 +464,7 @@ class VllmNativeBackend:
                         "model": self.model_id,
                         "logprobs_mode": self.logprobs_mode,
                         "batch_size": len(requests),
+                        "token_resolution": "bare_label_exact_roundtrip_v1",
                     },
                 )
             )
@@ -493,6 +479,8 @@ class VllmNativeBackend:
         beta: float,
         temperature: float = 1.0,
     ) -> VllmNativeDecision:
+        if not math.isfinite(temperature) or temperature <= 0:
+            raise ValueError("categorical decision temperature must be finite and positive")
         prompt_token_ids, action_token_ids = self.resolve_token_ids(request)
         extra_args = make_vllm_extra_args(
             action_token_ids=action_token_ids,
