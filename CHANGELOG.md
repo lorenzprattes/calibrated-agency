@@ -24,6 +24,6 @@
   and nonempty beta comparisons. Fingerprint immutable result maps without deepcopy errors.
 - Include token-resolution semantics in prior cache identity, now schema version 3. Previous
   fingerprints intentionally differ. This helper is not a DeSiRe cache-file implementation.
-- Add CPU source-level GABM/DeSiRe parity checks and isolated wheel-install checks in CI.
+- Add CPU source-level GABM/DeSiRe parity checks and verify isolated wheel installation.
 
 This is a local alpha build. Publication and fresh live-backend acceptance remain separate.

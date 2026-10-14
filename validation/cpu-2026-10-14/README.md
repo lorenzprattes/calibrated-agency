@@ -47,8 +47,8 @@ uv run mypy
 uv build
 ```
 
-Run the same pytest suite in separate environments for 3.12 and 3.14. The CI configuration
-also specifies 3.11 and 3.13; those two versions were not executed in this local validation.
+Run the same pytest suite in separate environments for 3.12 and 3.14. Versions 3.11 and
+3.13 were not executed in this local validation.
 Focused DeSiRe validation used:
 
 ```bash
