@@ -7,6 +7,7 @@ import argparse
 import importlib.metadata
 import json
 import platform
+from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Any
 
@@ -30,12 +31,13 @@ CONTEXTS = (
 )
 
 
-def requests() -> list[ScoreRequest]:
-    action_space = ActionSpace.from_mapping({"post": "post", "comment": "comment"})
+def requests(action_labels: Mapping[str, str] | None = None) -> list[ScoreRequest]:
+    action_space = ActionSpace.from_mapping(action_labels or {"post": "post", "comment": "comment"})
     system = ChatMessage(
         "system",
-        "Choose one forum action. The valid XML action is "
-        "<action>post</action> or <action>comment</action>.",
+        "Choose one forum action. Output one of these exact XML actions: "
+        + ", ".join(f"<action>{label}</action>" for label in action_space.labels)
+        + ".",
     )
     return [
         ScoreRequest(
@@ -68,9 +70,7 @@ def base_environment(mode: str, model: str) -> dict[str, Any]:
     }
 
 
-def serialize_score(
-    identifier: int, score: Any, request: ScoreRequest
-) -> dict[str, Any]:
+def serialize_score(identifier: int, score: Any, request: ScoreRequest) -> dict[str, Any]:
     return {
         "context_id": identifier,
         "request": {
@@ -87,13 +87,23 @@ def serialize_score(
         "token_ids": dict(score.token_ids),
         "selected_action": score.selected_action,
         "metadata": dict(score.metadata),
-        "raw_response": (
-            None if score.raw_response is None else dict(score.raw_response)
-        ),
+        "raw_response": (None if score.raw_response is None else dict(score.raw_response)),
     }
 
 
-def load_backend(mode: str, model_id: str, base_url: str | None) -> Any:
+def load_backend(
+    mode: str,
+    model_id: str,
+    base_url: str | None,
+    *,
+    revision: str | None = None,
+    gpu_memory_utilization: float = 0.88,
+) -> Any:
+    model_path = model_id
+    if revision is not None and mode != "api":
+        from huggingface_hub import snapshot_download
+
+        model_path = snapshot_download(model_id, revision=revision, local_files_only=True)
     chat_kwargs = {"enable_thinking": False}
     if mode == "api":
         if base_url is None:
@@ -112,10 +122,11 @@ def load_backend(mode: str, model_id: str, base_url: str | None) -> Any:
         from calibrated_agency.backends.vllm_native import VllmNativeBackend
 
         llm = LLM(
-            model=model_id,
+            model=model_path,
+            tokenizer=model_path,
             dtype="bfloat16",
             max_model_len=4096,
-            gpu_memory_utilization=0.88,
+            gpu_memory_utilization=gpu_memory_utilization,
             enforce_eager=True,
             logits_processors=[
                 "calibrated_agency.backends.vllm_native:BayesianActionLogitsProcessor"
@@ -139,17 +150,15 @@ def load_backend(mode: str, model_id: str, base_url: str | None) -> Any:
 
         from calibrated_agency.backends.transformers_native import TransformersNativeBackend
 
-        config = AutoConfig.from_pretrained(model_id)
+        config = AutoConfig.from_pretrained(model_path)
         model_class = (
-            AutoModelForMultimodalLM
-            if config.model_type == "qwen3_5"
-            else AutoModelForCausalLM
+            AutoModelForMultimodalLM if config.model_type == "qwen3_5" else AutoModelForCausalLM
         )
         model = model_class.from_pretrained(
-            model_id,
+            model_path,
             dtype=torch.bfloat16,
         ).to("cuda")
-        tokenizer = AutoTokenizer.from_pretrained(model_id)
+        tokenizer = AutoTokenizer.from_pretrained(model_path)
         return TransformersNativeBackend(
             model,
             tokenizer,
@@ -159,21 +168,40 @@ def load_backend(mode: str, model_id: str, base_url: str | None) -> Any:
     raise ValueError(f"unknown mode {mode}")
 
 
-def run(mode: str, model_id: str, base_url: str | None) -> dict[str, Any]:
-    backend = load_backend(mode, model_id, base_url)
-    score_requests = requests()
-    scores = [backend.score(request) for request in score_requests]
-    batch_scores = (
-        backend.score_batch(score_requests) if mode == "vllm-native" else []
-    )
+def run(
+    mode: str,
+    model_id: str,
+    base_url: str | None,
+    *,
+    backend: Any = None,
+    action_labels: Mapping[str, str] | None = None,
+    progress: Callable[[str], None] | None = None,
+) -> dict[str, Any]:
+    if backend is None:
+        backend = load_backend(mode, model_id, base_url)
+    score_requests = requests(action_labels)
+    scores = []
+    for index, request in enumerate(score_requests):
+        if progress is not None:
+            progress(f"score:{index}")
+        scores.append(backend.score(request))
+    batch_scores = backend.score_batch(score_requests) if mode == "vllm-native" else []
     prior = probability_mean_prior([score.probabilities for score in scores])
-    target = {"post": 0.2, "comment": 0.8}
+    actions = score_requests[0].action_space.actions
+    target = (
+        {"post": 0.2, "comment": 0.8}
+        if actions == ("post", "comment")
+        else {
+            action: (index + 1) / sum(range(1, len(actions) + 1))
+            for index, action in enumerate(actions)
+        }
+    )
     payload = base_environment(mode, model_id)
     payload.update(
         {
-            "score_mode": "raw_logprobs" if mode == "api" else (
-                "processed_logprobs" if mode == "vllm-native" else "raw_logits"
-            ),
+            "score_mode": "raw_logprobs"
+            if mode == "api"
+            else ("processed_logprobs" if mode == "vllm-native" else "raw_logits"),
             "contexts": list(CONTEXTS),
             "scores": [
                 serialize_score(index, score, score_requests[index])
@@ -205,6 +233,8 @@ def run(mode: str, model_id: str, base_url: str | None) -> dict[str, Any]:
         for context_id, request in enumerate(score_requests[:3]):
             for beta in (0.0, 0.15, 0.5, 1.0):
                 for temperature in (0.7, 1.0):
+                    if progress is not None:
+                        progress(f"native:{context_id}:{beta}:{temperature}")
                     decision = backend.decide_native(
                         request,
                         prior=prior,
@@ -227,14 +257,10 @@ def run(mode: str, model_id: str, base_url: str | None) -> dict[str, Any]:
                             "action": decision.action,
                             "token_id": decision.token_id,
                             "raw_scores": (
-                                None
-                                if decision.raw_scores is None
-                                else dict(decision.raw_scores)
+                                None if decision.raw_scores is None else dict(decision.raw_scores)
                             ),
                             "expected_probabilities": dict(expected_probabilities),
-                            "backend_reported_probabilities": dict(
-                                decision.sampled_probabilities
-                            ),
+                            "backend_reported_probabilities": dict(decision.sampled_probabilities),
                         }
                     )
         payload["native_decisions"] = decisions

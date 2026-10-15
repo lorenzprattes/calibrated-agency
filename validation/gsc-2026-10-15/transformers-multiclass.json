@@ -1,0 +1,2567 @@
+{
+  "mode": "transformers",
+  "model": "Qwen/Qwen3.5-4B",
+  "python": "3.12.13",
+  "packages": {
+    "calibrated-agency": "0.2.0a1",
+    "vllm": "0.26.0",
+    "transformers": "5.14.1",
+    "torch": "2.11.0+cu130"
+  },
+  "score_mode": "raw_logits",
+  "contexts": [
+    "A new topic has not been discussed yet and you have a distinct argument to introduce.",
+    "Another participant directly asked you a specific question in an existing discussion.",
+    "The feed contains a broad announcement and no comment is directed at you.",
+    "A participant made a factual claim you can correct with a short reply.",
+    "Several discussions repeat familiar points, while you have a new question for everyone.",
+    "An existing thread contains a nuanced argument that merits a direct response.",
+    "The feed is quiet and you have a self-contained observation to share.",
+    "A reply to your earlier message asks for clarification."
+  ],
+  "scores": [
+    {
+      "context_id": 0,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>reply</action>, <action>react</action>, <action>undo</action>, <action>share</action>, <action>follow</action>, <action>unsubscribe</action>, <action>join</action>, <action>leave</action>, <action>wait</action>, <action>stop</action>."
+          },
+          {
+            "role": "user",
+            "content": "A new topic has not been discussed yet and you have a distinct argument to introduce."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "reply",
+            "label": "reply"
+          },
+          {
+            "action": "react",
+            "label": "react"
+          },
+          {
+            "action": "unreact",
+            "label": "undo"
+          },
+          {
+            "action": "reshare",
+            "label": "share"
+          },
+          {
+            "action": "follow",
+            "label": "follow"
+          },
+          {
+            "action": "unfollow",
+            "label": "unsubscribe"
+          },
+          {
+            "action": "join_community",
+            "label": "join"
+          },
+          {
+            "action": "leave_community",
+            "label": "leave"
+          },
+          {
+            "action": "do_nothing",
+            "label": "wait"
+          },
+          {
+            "action": "stop",
+            "label": "stop"
+          }
+        ],
+        "seed": 20260805
+      },
+      "raw_scores": {
+        "post": 26.5,
+        "reply": 20.0,
+        "react": 19.25,
+        "unreact": 14.625,
+        "reshare": 17.625,
+        "follow": 18.5,
+        "unfollow": 11.6875,
+        "join_community": 23.0,
+        "leave_community": 16.625,
+        "do_nothing": 20.125,
+        "stop": 17.5
+      },
+      "probabilities": {
+        "post": 0.9663963622730434,
+        "reply": 0.001452918166992246,
+        "react": 0.0006863099459569212,
+        "unreact": 6.728345957815177e-06,
+        "reshare": 0.00013514244116767725,
+        "follow": 0.00032418986328354297,
+        "unfollow": 3.565892720302717e-07,
+        "join_community": 0.029182641489492903,
+        "leave_community": 4.9716125735309625e-05,
+        "do_nothing": 0.0016463719733599523,
+        "stop": 0.00011926278573819608
+      },
+      "token_ids": {
+        "post": 2134,
+        "reply": 20390,
+        "react": 2840,
+        "unreact": 13110,
+        "reshare": 18781,
+        "follow": 18000,
+        "unfollow": 87311,
+        "join_community": 5799,
+        "leave_community": 20852,
+        "do_nothing": 11158,
+        "stop": 9215
+      },
+      "selected_action": null,
+      "metadata": {
+        "backend": "transformers_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 1,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>reply</action>, <action>react</action>, <action>undo</action>, <action>share</action>, <action>follow</action>, <action>unsubscribe</action>, <action>join</action>, <action>leave</action>, <action>wait</action>, <action>stop</action>."
+          },
+          {
+            "role": "user",
+            "content": "Another participant directly asked you a specific question in an existing discussion."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "reply",
+            "label": "reply"
+          },
+          {
+            "action": "react",
+            "label": "react"
+          },
+          {
+            "action": "unreact",
+            "label": "undo"
+          },
+          {
+            "action": "reshare",
+            "label": "share"
+          },
+          {
+            "action": "follow",
+            "label": "follow"
+          },
+          {
+            "action": "unfollow",
+            "label": "unsubscribe"
+          },
+          {
+            "action": "join_community",
+            "label": "join"
+          },
+          {
+            "action": "leave_community",
+            "label": "leave"
+          },
+          {
+            "action": "do_nothing",
+            "label": "wait"
+          },
+          {
+            "action": "stop",
+            "label": "stop"
+          }
+        ],
+        "seed": 20260806
+      },
+      "raw_scores": {
+        "post": 22.375,
+        "reply": 24.5,
+        "react": 21.875,
+        "unreact": 17.75,
+        "reshare": 16.875,
+        "follow": 19.25,
+        "unfollow": 13.3125,
+        "join_community": 18.25,
+        "leave_community": 15.25,
+        "do_nothing": 21.75,
+        "stop": 20.125
+      },
+      "probabilities": {
+        "post": 0.09350163346878816,
+        "reply": 0.7828795920066126,
+        "react": 0.056711607432032934,
+        "unreact": 0.0009166577598138523,
+        "reshare": 0.00038211980510997954,
+        "follow": 0.0041081750633983165,
+        "unfollow": 1.0839904493160043e-05,
+        "join_community": 0.0015113131465574275,
+        "leave_community": 7.524385095290621e-05,
+        "do_nothing": 0.050047817899362586,
+        "stop": 0.009854999662877938
+      },
+      "token_ids": {
+        "post": 2134,
+        "reply": 20390,
+        "react": 2840,
+        "unreact": 13110,
+        "reshare": 18781,
+        "follow": 18000,
+        "unfollow": 87311,
+        "join_community": 5799,
+        "leave_community": 20852,
+        "do_nothing": 11158,
+        "stop": 9215
+      },
+      "selected_action": null,
+      "metadata": {
+        "backend": "transformers_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 2,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>reply</action>, <action>react</action>, <action>undo</action>, <action>share</action>, <action>follow</action>, <action>unsubscribe</action>, <action>join</action>, <action>leave</action>, <action>wait</action>, <action>stop</action>."
+          },
+          {
+            "role": "user",
+            "content": "The feed contains a broad announcement and no comment is directed at you."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "reply",
+            "label": "reply"
+          },
+          {
+            "action": "react",
+            "label": "react"
+          },
+          {
+            "action": "unreact",
+            "label": "undo"
+          },
+          {
+            "action": "reshare",
+            "label": "share"
+          },
+          {
+            "action": "follow",
+            "label": "follow"
+          },
+          {
+            "action": "unfollow",
+            "label": "unsubscribe"
+          },
+          {
+            "action": "join_community",
+            "label": "join"
+          },
+          {
+            "action": "leave_community",
+            "label": "leave"
+          },
+          {
+            "action": "do_nothing",
+            "label": "wait"
+          },
+          {
+            "action": "stop",
+            "label": "stop"
+          }
+        ],
+        "seed": 20260807
+      },
+      "raw_scores": {
+        "post": 22.625,
+        "reply": 19.125,
+        "react": 23.75,
+        "unreact": 19.375,
+        "reshare": 18.75,
+        "follow": 20.375,
+        "unfollow": 17.125,
+        "join_community": 19.75,
+        "leave_community": 17.25,
+        "do_nothing": 24.625,
+        "stop": 20.625
+      },
+      "probabilities": {
+        "post": 0.08428244344631704,
+        "reply": 0.0025451092605183103,
+        "react": 0.2596082023713268,
+        "unreact": 0.0032679849787528533,
+        "reshare": 0.0017492263081058542,
+        "follow": 0.008883304183421,
+        "unfollow": 0.00034444308264037143,
+        "join_community": 0.004754890087186646,
+        "leave_community": 0.0003903051462635059,
+        "do_nothing": 0.6227677027797864,
+        "stop": 0.011406388355681106
+      },
+      "token_ids": {
+        "post": 2134,
+        "reply": 20390,
+        "react": 2840,
+        "unreact": 13110,
+        "reshare": 18781,
+        "follow": 18000,
+        "unfollow": 87311,
+        "join_community": 5799,
+        "leave_community": 20852,
+        "do_nothing": 11158,
+        "stop": 9215
+      },
+      "selected_action": null,
+      "metadata": {
+        "backend": "transformers_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 3,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>reply</action>, <action>react</action>, <action>undo</action>, <action>share</action>, <action>follow</action>, <action>unsubscribe</action>, <action>join</action>, <action>leave</action>, <action>wait</action>, <action>stop</action>."
+          },
+          {
+            "role": "user",
+            "content": "A participant made a factual claim you can correct with a short reply."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "reply",
+            "label": "reply"
+          },
+          {
+            "action": "react",
+            "label": "react"
+          },
+          {
+            "action": "unreact",
+            "label": "undo"
+          },
+          {
+            "action": "reshare",
+            "label": "share"
+          },
+          {
+            "action": "follow",
+            "label": "follow"
+          },
+          {
+            "action": "unfollow",
+            "label": "unsubscribe"
+          },
+          {
+            "action": "join_community",
+            "label": "join"
+          },
+          {
+            "action": "leave_community",
+            "label": "leave"
+          },
+          {
+            "action": "do_nothing",
+            "label": "wait"
+          },
+          {
+            "action": "stop",
+            "label": "stop"
+          }
+        ],
+        "seed": 20260808
+      },
+      "raw_scores": {
+        "post": 22.625,
+        "reply": 26.5,
+        "react": 20.625,
+        "unreact": 17.25,
+        "reshare": 14.5,
+        "follow": 16.5,
+        "unfollow": 12.8125,
+        "join_community": 14.625,
+        "leave_community": 12.9375,
+        "do_nothing": 15.25,
+        "stop": 17.875
+      },
+      "probabilities": {
+        "post": 0.02026963531138718,
+        "reply": 0.9766457226791715,
+        "react": 0.0027431968359694307,
+        "unreact": 9.38670338853899e-05,
+        "reshare": 6.000718714110522e-06,
+        "follow": 4.433964721246564e-05,
+        "unfollow": 1.110021348186123e-06,
+        "join_community": 6.799705128183493e-06,
+        "leave_community": 1.2578189735682585e-06,
+        "do_nothing": 1.2703521617459963e-05,
+        "stop": 0.00017536670659253312
+      },
+      "token_ids": {
+        "post": 2134,
+        "reply": 20390,
+        "react": 2840,
+        "unreact": 13110,
+        "reshare": 18781,
+        "follow": 18000,
+        "unfollow": 87311,
+        "join_community": 5799,
+        "leave_community": 20852,
+        "do_nothing": 11158,
+        "stop": 9215
+      },
+      "selected_action": null,
+      "metadata": {
+        "backend": "transformers_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 4,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>reply</action>, <action>react</action>, <action>undo</action>, <action>share</action>, <action>follow</action>, <action>unsubscribe</action>, <action>join</action>, <action>leave</action>, <action>wait</action>, <action>stop</action>."
+          },
+          {
+            "role": "user",
+            "content": "Several discussions repeat familiar points, while you have a new question for everyone."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "reply",
+            "label": "reply"
+          },
+          {
+            "action": "react",
+            "label": "react"
+          },
+          {
+            "action": "unreact",
+            "label": "undo"
+          },
+          {
+            "action": "reshare",
+            "label": "share"
+          },
+          {
+            "action": "follow",
+            "label": "follow"
+          },
+          {
+            "action": "unfollow",
+            "label": "unsubscribe"
+          },
+          {
+            "action": "join_community",
+            "label": "join"
+          },
+          {
+            "action": "leave_community",
+            "label": "leave"
+          },
+          {
+            "action": "do_nothing",
+            "label": "wait"
+          },
+          {
+            "action": "stop",
+            "label": "stop"
+          }
+        ],
+        "seed": 20260809
+      },
+      "raw_scores": {
+        "post": 25.75,
+        "reply": 22.375,
+        "react": 21.25,
+        "unreact": 15.875,
+        "reshare": 19.25,
+        "follow": 19.125,
+        "unfollow": 13.3125,
+        "join_community": 20.75,
+        "leave_community": 16.375,
+        "do_nothing": 21.875,
+        "stop": 19.375
+      },
+      "probabilities": {
+        "post": 0.9280798710601296,
+        "reply": 0.031757146830611274,
+        "react": 0.010310036074819347,
+        "unreact": 4.774493920228449e-05,
+        "reshare": 0.001395311652365371,
+        "follow": 0.0012313582113526334,
+        "unfollow": 3.6816943816708684e-06,
+        "join_community": 0.006253352982121228,
+        "leave_community": 7.871809683109085e-05,
+        "do_nothing": 0.019261683217761623,
+        "stop": 0.0015810952404239373
+      },
+      "token_ids": {
+        "post": 2134,
+        "reply": 20390,
+        "react": 2840,
+        "unreact": 13110,
+        "reshare": 18781,
+        "follow": 18000,
+        "unfollow": 87311,
+        "join_community": 5799,
+        "leave_community": 20852,
+        "do_nothing": 11158,
+        "stop": 9215
+      },
+      "selected_action": null,
+      "metadata": {
+        "backend": "transformers_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 5,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>reply</action>, <action>react</action>, <action>undo</action>, <action>share</action>, <action>follow</action>, <action>unsubscribe</action>, <action>join</action>, <action>leave</action>, <action>wait</action>, <action>stop</action>."
+          },
+          {
+            "role": "user",
+            "content": "An existing thread contains a nuanced argument that merits a direct response."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "reply",
+            "label": "reply"
+          },
+          {
+            "action": "react",
+            "label": "react"
+          },
+          {
+            "action": "unreact",
+            "label": "undo"
+          },
+          {
+            "action": "reshare",
+            "label": "share"
+          },
+          {
+            "action": "follow",
+            "label": "follow"
+          },
+          {
+            "action": "unfollow",
+            "label": "unsubscribe"
+          },
+          {
+            "action": "join_community",
+            "label": "join"
+          },
+          {
+            "action": "leave_community",
+            "label": "leave"
+          },
+          {
+            "action": "do_nothing",
+            "label": "wait"
+          },
+          {
+            "action": "stop",
+            "label": "stop"
+          }
+        ],
+        "seed": 20260810
+      },
+      "raw_scores": {
+        "post": 24.125,
+        "reply": 26.875,
+        "react": 20.125,
+        "unreact": 13.5625,
+        "reshare": 14.125,
+        "follow": 16.5,
+        "unfollow": 11.3125,
+        "join_community": 15.875,
+        "leave_community": 13.375,
+        "do_nothing": 16.375,
+        "stop": 15.75
+      },
+      "probabilities": {
+        "post": 0.06001517080579264,
+        "reply": 0.938795224381691,
+        "react": 0.0010992161963245999,
+        "unreact": 1.5524784532839496e-06,
+        "reshare": 2.724684539266517e-06,
+        "follow": 2.9293119409552703e-05,
+        "unfollow": 1.6363002512513083e-07,
+        "join_community": 1.567947694093454e-05,
+        "leave_community": 1.2870498431200646e-06,
+        "do_nothing": 2.5851087145970955e-05,
+        "stop": 1.3837089834521319e-05
+      },
+      "token_ids": {
+        "post": 2134,
+        "reply": 20390,
+        "react": 2840,
+        "unreact": 13110,
+        "reshare": 18781,
+        "follow": 18000,
+        "unfollow": 87311,
+        "join_community": 5799,
+        "leave_community": 20852,
+        "do_nothing": 11158,
+        "stop": 9215
+      },
+      "selected_action": null,
+      "metadata": {
+        "backend": "transformers_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 6,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>reply</action>, <action>react</action>, <action>undo</action>, <action>share</action>, <action>follow</action>, <action>unsubscribe</action>, <action>join</action>, <action>leave</action>, <action>wait</action>, <action>stop</action>."
+          },
+          {
+            "role": "user",
+            "content": "The feed is quiet and you have a self-contained observation to share."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "reply",
+            "label": "reply"
+          },
+          {
+            "action": "react",
+            "label": "react"
+          },
+          {
+            "action": "unreact",
+            "label": "undo"
+          },
+          {
+            "action": "reshare",
+            "label": "share"
+          },
+          {
+            "action": "follow",
+            "label": "follow"
+          },
+          {
+            "action": "unfollow",
+            "label": "unsubscribe"
+          },
+          {
+            "action": "join_community",
+            "label": "join"
+          },
+          {
+            "action": "leave_community",
+            "label": "leave"
+          },
+          {
+            "action": "do_nothing",
+            "label": "wait"
+          },
+          {
+            "action": "stop",
+            "label": "stop"
+          }
+        ],
+        "seed": 20260811
+      },
+      "raw_scores": {
+        "post": 26.875,
+        "reply": 18.375,
+        "react": 21.125,
+        "unreact": 14.9375,
+        "reshare": 21.125,
+        "follow": 19.0,
+        "unfollow": 13.875,
+        "join_community": 19.75,
+        "leave_community": 14.875,
+        "do_nothing": 21.0,
+        "stop": 17.75
+      },
+      "probabilities": {
+        "post": 0.9894264546977584,
+        "reply": 0.00020131698699333702,
+        "react": 0.0031491275195706663,
+        "unreact": 6.4713239429062135e-06,
+        "reshare": 0.0031491275195706663,
+        "follow": 0.00037610964711273684,
+        "unfollow": 2.2364297115983523e-06,
+        "join_community": 0.0007962241291858511,
+        "leave_community": 6.079246245663705e-06,
+        "do_nothing": 0.0027790952818650227,
+        "stop": 0.00010775721804319254
+      },
+      "token_ids": {
+        "post": 2134,
+        "reply": 20390,
+        "react": 2840,
+        "unreact": 13110,
+        "reshare": 18781,
+        "follow": 18000,
+        "unfollow": 87311,
+        "join_community": 5799,
+        "leave_community": 20852,
+        "do_nothing": 11158,
+        "stop": 9215
+      },
+      "selected_action": null,
+      "metadata": {
+        "backend": "transformers_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 7,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>reply</action>, <action>react</action>, <action>undo</action>, <action>share</action>, <action>follow</action>, <action>unsubscribe</action>, <action>join</action>, <action>leave</action>, <action>wait</action>, <action>stop</action>."
+          },
+          {
+            "role": "user",
+            "content": "A reply to your earlier message asks for clarification."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "reply",
+            "label": "reply"
+          },
+          {
+            "action": "react",
+            "label": "react"
+          },
+          {
+            "action": "unreact",
+            "label": "undo"
+          },
+          {
+            "action": "reshare",
+            "label": "share"
+          },
+          {
+            "action": "follow",
+            "label": "follow"
+          },
+          {
+            "action": "unfollow",
+            "label": "unsubscribe"
+          },
+          {
+            "action": "join_community",
+            "label": "join"
+          },
+          {
+            "action": "leave_community",
+            "label": "leave"
+          },
+          {
+            "action": "do_nothing",
+            "label": "wait"
+          },
+          {
+            "action": "stop",
+            "label": "stop"
+          }
+        ],
+        "seed": 20260812
+      },
+      "raw_scores": {
+        "post": 22.25,
+        "reply": 26.0,
+        "react": 19.5,
+        "unreact": 18.0,
+        "reshare": 14.6875,
+        "follow": 17.75,
+        "unfollow": 13.0,
+        "join_community": 15.5,
+        "leave_community": 14.0625,
+        "do_nothing": 19.25,
+        "stop": 18.5
+      },
+      "probabilities": {
+        "post": 0.02289075822064799,
+        "reply": 0.9733398073437844,
+        "react": 0.001463357214445885,
+        "unreact": 0.0003265191296136702,
+        "reshare": 1.1893458426776425e-05,
+        "follow": 0.0002542933538309199,
+        "unfollow": 2.200068589524428e-06,
+        "join_community": 2.6802322305014754e-05,
+        "leave_community": 6.366109547547572e-06,
+        "do_nothing": 0.0011396637445236452,
+        "stop": 0.0005383390342845507
+      },
+      "token_ids": {
+        "post": 2134,
+        "reply": 20390,
+        "react": 2840,
+        "unreact": 13110,
+        "reshare": 18781,
+        "follow": 18000,
+        "unfollow": 87311,
+        "join_community": 5799,
+        "leave_community": 20852,
+        "do_nothing": 11158,
+        "stop": 9215
+      },
+      "selected_action": null,
+      "metadata": {
+        "backend": "transformers_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    }
+  ],
+  "batch_scores": [],
+  "probability_mean_prior": {
+    "post": 0.39560779116048306,
+    "reply": 0.4634521047070469,
+    "react": 0.041971381698805835,
+    "unreact": 0.0005834407487027571,
+    "reshare": 0.0008539433234999628,
+    "follow": 0.0019063828861276462,
+    "unfollow": 4.562892755770833e-05,
+    "join_community": 0.005318462917364776,
+    "leave_community": 7.612168054908903e-05,
+    "do_nothing": 0.08721011118817786,
+    "stop": 0.002974630761684498
+  },
+  "target": {
+    "post": 0.015151515151515152,
+    "reply": 0.030303030303030304,
+    "react": 0.045454545454545456,
+    "unreact": 0.06060606060606061,
+    "reshare": 0.07575757575757576,
+    "follow": 0.09090909090909091,
+    "unfollow": 0.10606060606060606,
+    "join_community": 0.12121212121212122,
+    "leave_community": 0.13636363636363635,
+    "do_nothing": 0.15151515151515152,
+    "stop": 0.16666666666666666
+  },
+  "core_corrections": [
+    {
+      "context_id": 0,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.015151515151515157,
+        "reply": 0.030303030303030304,
+        "react": 0.04545454545454546,
+        "unreact": 0.060606060606060615,
+        "reshare": 0.07575757575757576,
+        "follow": 0.0909090909090909,
+        "unfollow": 0.10606060606060606,
+        "join_community": 0.12121212121212123,
+        "leave_community": 0.13636363636363635,
+        "do_nothing": 0.15151515151515155,
+        "stop": 0.16666666666666669
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.02357528976138438,
+        "reply": 0.017367564150855372,
+        "react": 0.03337565368463221,
+        "unreact": 0.04222991394949507,
+        "reshare": 0.07818940043349062,
+        "follow": 0.09484471093163618,
+        "unfollow": 0.0697125089958484,
+        "join_community": 0.2129434217500847,
+        "leave_community": 0.17408618885373645,
+        "do_nothing": 0.11367570082654305,
+        "stop": 0.1399996466622935
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.04206030440091711,
+        "reply": 0.0030135286837340057,
+        "react": 0.010323618663830619,
+        "unreact": 0.011559603972736771,
+        "reshare": 0.05352769554496117,
+        "follow": 0.06658449142720299,
+        "unfollow": 0.016652875385088566,
+        "join_community": 0.5042970241575184,
+        "leave_community": 0.1957330442132582,
+        "do_nothing": 0.0369749630214131,
+        "stop": 0.05927285052933893
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.044564887129406566,
+        "reply": 0.00011438488805488991,
+        "react": 0.0008949332448182255,
+        "unreact": 0.0008415383416997613,
+        "reshare": 0.014435607893703552,
+        "follow": 0.018614137236354064,
+        "unfollow": 0.0009979951078266844,
+        "join_community": 0.800812441594922,
+        "leave_community": 0.10723431451054918,
+        "do_nothing": 0.0034440027111171997,
+        "stop": 0.008045757341547825
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.015151515151515157,
+        "reply": 0.030303030303030304,
+        "react": 0.04545454545454546,
+        "unreact": 0.060606060606060615,
+        "reshare": 0.07575757575757576,
+        "follow": 0.0909090909090909,
+        "unfollow": 0.10606060606060606,
+        "join_community": 0.12121212121212123,
+        "leave_community": 0.13636363636363635,
+        "do_nothing": 0.15151515151515155,
+        "stop": 0.16666666666666669
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.012359237631462688,
+        "reply": 0.03320030251053375,
+        "react": 0.048160122900642366,
+        "unreact": 0.06568256265191479,
+        "reshare": 0.06800551088858137,
+        "follow": 0.1033060129154089,
+        "unfollow": 0.08658134884724333,
+        "join_community": 0.10164447192522096,
+        "leave_community": 0.1378622730121422,
+        "do_nothing": 0.1411826320768906,
+        "stop": 0.20201552463995912
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.0071534993883122224,
+        "reply": 0.03824867681768903,
+        "react": 0.051312356913449556,
+        "unreact": 0.07377455276105618,
+        "reshare": 0.04921490122444622,
+        "follow": 0.12960209427819952,
+        "unfollow": 0.05020326938069513,
+        "join_community": 0.06275025755674844,
+        "leave_community": 0.1316634395102796,
+        "do_nothing": 0.11146807899417731,
+        "stop": 0.29460887317494666
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.0028091855227281317,
+        "reply": 0.040155604541380445,
+        "react": 0.04817991228530971,
+        "unreact": 0.07469585664756667,
+        "reshare": 0.026592952886773297,
+        "follow": 0.15367956461478066,
+        "unfollow": 0.019765567767632174,
+        "join_community": 0.027019939440481044,
+        "leave_community": 0.1057380302473343,
+        "do_nothing": 0.06820942151383541,
+        "stop": 0.43315396453217825
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.015151515151515157,
+        "reply": 0.030303030303030304,
+        "react": 0.04545454545454546,
+        "unreact": 0.060606060606060615,
+        "reshare": 0.07575757575757576,
+        "follow": 0.0909090909090909,
+        "unfollow": 0.10606060606060606,
+        "join_community": 0.12121212121212123,
+        "leave_community": 0.13636363636363635,
+        "do_nothing": 0.15151515151515155,
+        "stop": 0.16666666666666669
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.009950862747948024,
+        "reply": 0.011496750998320066,
+        "react": 0.04947843107937948,
+        "unreact": 0.06499686042270685,
+        "reshare": 0.0698670555816581,
+        "follow": 0.0948409301420137,
+        "unfollow": 0.11895138818646973,
+        "join_community": 0.0987149733984002,
+        "leave_community": 0.14431676651194406,
+        "do_nothing": 0.1685209039467014,
+        "stop": 0.16886507698445835
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.0034682297914975487,
+        "reply": 0.0011136597032626173,
+        "react": 0.05606289884067255,
+        "unreact": 0.07113336632079058,
+        "reshare": 0.05377125890852658,
+        "follow": 0.09732068910182622,
+        "unfollow": 0.14451348240118336,
+        "join_community": 0.05683801260120881,
+        "leave_community": 0.1531306718423358,
+        "do_nothing": 0.20079428338143646,
+        "stop": 0.16185344710725932
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.000712250054984067,
+        "reply": 3.671907884548047e-05,
+        "react": 0.06203640290967929,
+        "unreact": 0.07490373860226415,
+        "reshare": 0.0342410573533775,
+        "follow": 0.09347077917136766,
+        "unfollow": 0.17665887304626496,
+        "join_community": 0.023911374615842668,
+        "leave_community": 0.15427609196042524,
+        "do_nothing": 0.23873684550884086,
+        "stop": 0.14101586769810817
+      }
+    },
+    {
+      "context_id": 3,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.015151515151515157,
+        "reply": 0.030303030303030304,
+        "react": 0.04545454545454546,
+        "unreact": 0.060606060606060615,
+        "reshare": 0.07575757575757576,
+        "follow": 0.0909090909090909,
+        "unfollow": 0.10606060606060606,
+        "join_community": 0.12121212121212123,
+        "leave_community": 0.13636363636363635,
+        "do_nothing": 0.15151515151515155,
+        "stop": 0.16666666666666669
+      }
+    },
+    {
+      "context_id": 3,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.018105336590420216,
+        "reply": 0.06323525335483313,
+        "react": 0.05633603125231174,
+        "unreact": 0.0859818687774468,
+        "reshare": 0.06719788061816415,
+        "follow": 0.09649570957100746,
+        "unfollow": 0.11333945988998358,
+        "join_community": 0.08326548515359974,
+        "leave_community": 0.13750814193014285,
+        "do_nothing": 0.0751403185416552,
+        "stop": 0.20339451432043526
+      }
+    },
+    {
+      "context_id": 3,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.018612373909932197,
+        "reply": 0.23873017237333818,
+        "react": 0.06306440843580818,
+        "unreact": 0.13192569140829213,
+        "reshare": 0.03446421052993297,
+        "follow": 0.07524082015789767,
+        "unfollow": 0.08977487190544003,
+        "join_community": 0.023520858990821805,
+        "leave_community": 0.09512805463559365,
+        "do_nothing": 0.009924071042434647,
+        "stop": 0.21961446661050843
+      }
+    },
+    {
+      "context_id": 3,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.00818558457022113,
+        "reply": 0.6733343805003654,
+        "react": 0.03132517893024022,
+        "unreact": 0.10281226551344937,
+        "reshare": 0.005613229867501288,
+        "follow": 0.022294716487769175,
+        "unfollow": 0.027205562564708546,
+        "join_community": 0.0016340394305437405,
+        "leave_community": 0.023758602099589347,
+        "do_nothing": 0.0002327158114661822,
+        "stop": 0.10360372422414559
+      }
+    },
+    {
+      "context_id": 4,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.015151515151515157,
+        "reply": 0.030303030303030304,
+        "react": 0.04545454545454546,
+        "unreact": 0.060606060606060615,
+        "reshare": 0.07575757575757576,
+        "follow": 0.0909090909090909,
+        "unfollow": 0.10606060606060606,
+        "join_community": 0.12121212121212123,
+        "leave_community": 0.13636363636363635,
+        "do_nothing": 0.15151515151515155,
+        "stop": 0.16666666666666669
+      }
+    },
+    {
+      "context_id": 4,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.019369211038629798,
+        "reply": 0.022801811015501283,
+        "react": 0.041422007784577726,
+        "unreact": 0.04683423521983091,
+        "reshare": 0.09173185668135224,
+        "follow": 0.09577259299303245,
+        "unfollow": 0.08178676199907975,
+        "join_community": 0.13970207659693493,
+        "leave_community": 0.15416695534908953,
+        "do_nothing": 0.1358885807640203,
+        "stop": 0.17052391055795105
+      }
+    },
+    {
+      "context_id": 4,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.03162328503013027,
+        "reply": 0.010809236737031892,
+        "react": 0.030698802706438096,
+        "unreact": 0.02362501040904909,
+        "reshare": 0.13195863515310538,
+        "follow": 0.09956005189146819,
+        "unfollow": 0.0410533404215996,
+        "join_community": 0.17910186780646772,
+        "leave_community": 0.18896107117961797,
+        "do_nothing": 0.09703098089994532,
+        "stop": 0.16557771776514638
+      }
+    },
+    {
+      "context_id": 4,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.05465117249624164,
+        "reply": 0.0031926078734137177,
+        "react": 0.017167503302638012,
+        "unreact": 0.007625521406243609,
+        "reshare": 0.19032294292028137,
+        "follow": 0.09028269135106298,
+        "unfollow": 0.01315783632668948,
+        "join_community": 0.2191269338459162,
+        "leave_community": 0.2168141857035256,
+        "do_nothing": 0.051452485900737005,
+        "stop": 0.13620611887325032
+      }
+    },
+    {
+      "context_id": 5,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.015151515151515157,
+        "reply": 0.030303030303030304,
+        "react": 0.04545454545454546,
+        "unreact": 0.060606060606060615,
+        "reshare": 0.07575757575757576,
+        "follow": 0.0909090909090909,
+        "unfollow": 0.10606060606060606,
+        "join_community": 0.12121212121212123,
+        "leave_community": 0.13636363636363635,
+        "do_nothing": 0.15151515151515155,
+        "stop": 0.16666666666666669
+      }
+    },
+    {
+      "context_id": 5,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.02448799810217183,
+        "reply": 0.072246822151426,
+        "react": 0.05644748332560912,
+        "unreact": 0.05340945744170555,
+        "reshare": 0.06860518388334286,
+        "follow": 0.10421696594454433,
+        "unfollow": 0.09774516897677057,
+        "join_community": 0.10847399962730099,
+        "leave_community": 0.15858401555405371,
+        "do_nothing": 0.09607063186423752,
+        "stop": 0.15971227312883737
+      }
+    },
+    {
+      "context_id": 5,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.049301120082330674,
+        "reply": 0.3603061566847857,
+        "react": 0.06145325086857306,
+        "unreact": 0.02611758904717101,
+        "reshare": 0.0357496896025357,
+        "follow": 0.09414292271265928,
+        "unfollow": 0.05306010301984732,
+        "join_community": 0.05498210788312582,
+        "leave_community": 0.14813056850745304,
+        "do_nothing": 0.02179288197267271,
+        "stop": 0.09496360961884566
+      }
+    },
+    {
+      "context_id": 5,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.03258681862001441,
+        "reply": 0.8702454503971833,
+        "react": 0.016877062552984136,
+        "unreact": 0.0022863071143043538,
+        "reshare": 0.00342691188184405,
+        "follow": 0.01980398070937635,
+        "unfollow": 0.005392206661343557,
+        "join_community": 0.0050661865218715975,
+        "leave_community": 0.032687014874463995,
+        "do_nothing": 0.0006367335362926883,
+        "stop": 0.010991327130321624
+      }
+    },
+    {
+      "context_id": 6,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.015151515151515157,
+        "reply": 0.030303030303030304,
+        "react": 0.04545454545454546,
+        "unreact": 0.060606060606060615,
+        "reshare": 0.07575757575757576,
+        "follow": 0.0909090909090909,
+        "unfollow": 0.10606060606060606,
+        "join_community": 0.12121212121212123,
+        "leave_community": 0.13636363636363635,
+        "do_nothing": 0.15151515151515155,
+        "stop": 0.16666666666666669
+      }
+    },
+    {
+      "context_id": 6,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.02499289199807318,
+        "reply": 0.01363986400671791,
+        "react": 0.04431038382592422,
+        "unreact": 0.04435148430406591,
+        "reshare": 0.13245943384786962,
+        "follow": 0.10245086084661775,
+        "unfollow": 0.09699380549940981,
+        "join_community": 0.13106178453854034,
+        "leave_community": 0.13418143272207958,
+        "do_nothing": 0.12989702351440272,
+        "stop": 0.1456610348962989
+      }
+    },
+    {
+      "context_id": 6,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.06036073449635621,
+        "reply": 0.0015909735225144307,
+        "react": 0.03136425093849198,
+        "unreact": 0.01607878979017323,
+        "reshare": 0.36647620291451927,
+        "follow": 0.10171818363191147,
+        "unfollow": 0.05914945001182098,
+        "join_community": 0.11814348058787065,
+        "leave_community": 0.09707521655233736,
+        "do_nothing": 0.0681339352059397,
+        "stop": 0.07990878234806474
+      }
+    },
+    {
+      "context_id": 6,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.09858016295382917,
+        "reply": 3.424336290806338e-05,
+        "react": 0.00887215427737832,
+        "unreact": 0.0017487479706751231,
+        "reshare": 0.7267784707700127,
+        "follow": 0.04665803478368784,
+        "unfollow": 0.013523337339156092,
+        "join_community": 0.04720739498654753,
+        "leave_community": 0.02833053178871831,
+        "do_nothing": 0.012560514997574898,
+        "stop": 0.015706406769511884
+      }
+    },
+    {
+      "context_id": 7,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.015151515151515157,
+        "reply": 0.030303030303030304,
+        "react": 0.04545454545454546,
+        "unreact": 0.060606060606060615,
+        "reshare": 0.07575757575757576,
+        "follow": 0.0909090909090909,
+        "unfollow": 0.10606060606060606,
+        "join_community": 0.12121212121212123,
+        "leave_community": 0.13636363636363635,
+        "do_nothing": 0.15151515151515155,
+        "stop": 0.16666666666666669
+      }
+    },
+    {
+      "context_id": 7,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.01501711570219072,
+        "reply": 0.051474977470482235,
+        "react": 0.041754957239005526,
+        "unreact": 0.08442556927429966,
+        "reshare": 0.06064277923298633,
+        "follow": 0.10212855984574362,
+        "unfollow": 0.10228328306289314,
+        "join_community": 0.08330578401904051,
+        "leave_community": 0.1428316969543486,
+        "do_nothing": 0.12013200054912507,
+        "stop": 0.19600327664988457
+      }
+    },
+    {
+      "context_id": 7,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.012025276885258129,
+        "reply": 0.14489627567713884,
+        "react": 0.02800381576716902,
+        "unreact": 0.14959371284516915,
+        "reshare": 0.029498978265268157,
+        "follow": 0.10954967758525014,
+        "unfollow": 0.07684107525996359,
+        "join_community": 0.02839099059040359,
+        "leave_community": 0.13011362998708043,
+        "do_nothing": 0.05714817421445911,
+        "stop": 0.23393839292283983
+      }
+    },
+    {
+      "context_id": 7,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.0053959175079812275,
+        "reply": 0.3917054207297206,
+        "react": 0.009754124639080555,
+        "unreact": 0.2087573730008062,
+        "reshare": 0.006494101546010295,
+        "follow": 0.07463561037827003,
+        "unfollow": 0.03147487098906218,
+        "join_community": 0.003759639781730247,
+        "leave_community": 0.07019047943188336,
+        "do_nothing": 0.012186524102890096,
+        "stop": 0.18564593789256512
+      }
+    }
+  ],
+  "native_decisions": [
+    {
+      "context_id": 0,
+      "beta": 0.0,
+      "temperature": 0.7,
+      "action": "do_nothing",
+      "token_id": 11158,
+      "raw_scores": {
+        "post": 26.5,
+        "reply": 20.0,
+        "react": 19.25,
+        "unreact": 14.625,
+        "reshare": 17.625,
+        "follow": 18.5,
+        "unfollow": 11.6875,
+        "join_community": 23.0,
+        "leave_community": 16.625,
+        "do_nothing": 20.125,
+        "stop": 17.5
+      },
+      "expected_probabilities": {
+        "post": 0.015151515151515157,
+        "reply": 0.030303030303030304,
+        "react": 0.04545454545454546,
+        "unreact": 0.060606060606060615,
+        "reshare": 0.07575757575757576,
+        "follow": 0.0909090909090909,
+        "unfollow": 0.10606060606060606,
+        "join_community": 0.12121212121212123,
+        "leave_community": 0.13636363636363635,
+        "do_nothing": 0.15151515151515155,
+        "stop": 0.16666666666666669
+      },
+      "backend_reported_probabilities": {
+        "post": 0.015151514636604102,
+        "reply": 0.030303029330925,
+        "react": 0.04545454481136172,
+        "unreact": 0.06060605877728359,
+        "reshare": 0.07575757546111005,
+        "follow": 0.09090908979587382,
+        "unfollow": 0.10606060949043265,
+        "join_community": 0.12121211778543436,
+        "leave_community": 0.13636363713873345,
+        "do_nothing": 0.15151515121080408,
+        "stop": 0.1666666715614372
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.0,
+      "temperature": 1.0,
+      "action": "do_nothing",
+      "token_id": 11158,
+      "raw_scores": {
+        "post": 26.5,
+        "reply": 20.0,
+        "react": 19.25,
+        "unreact": 14.625,
+        "reshare": 17.625,
+        "follow": 18.5,
+        "unfollow": 11.6875,
+        "join_community": 23.0,
+        "leave_community": 16.625,
+        "do_nothing": 20.125,
+        "stop": 17.5
+      },
+      "expected_probabilities": {
+        "post": 0.015151515151515157,
+        "reply": 0.030303030303030304,
+        "react": 0.04545454545454546,
+        "unreact": 0.060606060606060615,
+        "reshare": 0.07575757575757576,
+        "follow": 0.0909090909090909,
+        "unfollow": 0.10606060606060606,
+        "join_community": 0.12121212121212123,
+        "leave_community": 0.13636363636363635,
+        "do_nothing": 0.15151515151515155,
+        "stop": 0.16666666666666669
+      },
+      "backend_reported_probabilities": {
+        "post": 0.015151514636604102,
+        "reply": 0.030303029330925,
+        "react": 0.04545454481136172,
+        "unreact": 0.06060605877728359,
+        "reshare": 0.07575757546111005,
+        "follow": 0.09090908979587382,
+        "unfollow": 0.10606060949043265,
+        "join_community": 0.12121211778543436,
+        "leave_community": 0.13636363713873345,
+        "do_nothing": 0.15151515121080408,
+        "stop": 0.1666666715614372
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.15,
+      "temperature": 0.7,
+      "action": "do_nothing",
+      "token_id": 11158,
+      "raw_scores": {
+        "post": 26.5,
+        "reply": 20.0,
+        "react": 19.25,
+        "unreact": 14.625,
+        "reshare": 17.625,
+        "follow": 18.5,
+        "unfollow": 11.6875,
+        "join_community": 23.0,
+        "leave_community": 16.625,
+        "do_nothing": 20.125,
+        "stop": 17.5
+      },
+      "expected_probabilities": {
+        "post": 0.02357528976138438,
+        "reply": 0.017367564150855372,
+        "react": 0.03337565368463221,
+        "unreact": 0.04222991394949507,
+        "reshare": 0.07818940043349062,
+        "follow": 0.09484471093163618,
+        "unfollow": 0.0697125089958484,
+        "join_community": 0.2129434217500847,
+        "leave_community": 0.17408618885373645,
+        "do_nothing": 0.11367570082654305,
+        "stop": 0.1399996466622935
+      },
+      "backend_reported_probabilities": {
+        "post": 0.023575292999004935,
+        "reply": 0.01736756826381604,
+        "react": 0.03337565220231737,
+        "unreact": 0.04222991550124223,
+        "reshare": 0.07818939701323371,
+        "follow": 0.09484471165630687,
+        "unfollow": 0.06971251454167669,
+        "join_community": 0.21294339485882294,
+        "leave_community": 0.1740862104858037,
+        "do_nothing": 0.11367569949626172,
+        "stop": 0.13999964298151388
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.15,
+      "temperature": 1.0,
+      "action": "do_nothing",
+      "token_id": 11158,
+      "raw_scores": {
+        "post": 26.5,
+        "reply": 20.0,
+        "react": 19.25,
+        "unreact": 14.625,
+        "reshare": 17.625,
+        "follow": 18.5,
+        "unfollow": 11.6875,
+        "join_community": 23.0,
+        "leave_community": 16.625,
+        "do_nothing": 20.125,
+        "stop": 17.5
+      },
+      "expected_probabilities": {
+        "post": 0.02357528976138438,
+        "reply": 0.017367564150855372,
+        "react": 0.03337565368463221,
+        "unreact": 0.04222991394949507,
+        "reshare": 0.07818940043349062,
+        "follow": 0.09484471093163618,
+        "unfollow": 0.0697125089958484,
+        "join_community": 0.2129434217500847,
+        "leave_community": 0.17408618885373645,
+        "do_nothing": 0.11367570082654305,
+        "stop": 0.1399996466622935
+      },
+      "backend_reported_probabilities": {
+        "post": 0.023575293094801563,
+        "reply": 0.017367568334387993,
+        "react": 0.0333756523379371,
+        "unreact": 0.042229915672840665,
+        "reshare": 0.0781893973309511,
+        "follow": 0.09484471204170201,
+        "unfollow": 0.06971251482494883,
+        "join_community": 0.21294339572410423,
+        "leave_community": 0.17408619044049908,
+        "do_nothing": 0.11367569995817532,
+        "stop": 0.13999966023965213
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.5,
+      "temperature": 0.7,
+      "action": "join_community",
+      "token_id": 5799,
+      "raw_scores": {
+        "post": 26.5,
+        "reply": 20.0,
+        "react": 19.25,
+        "unreact": 14.625,
+        "reshare": 17.625,
+        "follow": 18.5,
+        "unfollow": 11.6875,
+        "join_community": 23.0,
+        "leave_community": 16.625,
+        "do_nothing": 20.125,
+        "stop": 17.5
+      },
+      "expected_probabilities": {
+        "post": 0.04206030440091711,
+        "reply": 0.0030135286837340057,
+        "react": 0.010323618663830619,
+        "unreact": 0.011559603972736771,
+        "reshare": 0.05352769554496117,
+        "follow": 0.06658449142720299,
+        "unfollow": 0.016652875385088566,
+        "join_community": 0.5042970241575184,
+        "leave_community": 0.1957330442132582,
+        "do_nothing": 0.0369749630214131,
+        "stop": 0.05927285052933893
+      },
+      "backend_reported_probabilities": {
+        "post": 0.04206032904999842,
+        "reply": 0.003013529519803965,
+        "react": 0.010323617981933814,
+        "unreact": 0.011559610443319896,
+        "reshare": 0.05352771637431421,
+        "follow": 0.06658443478656868,
+        "unfollow": 0.01665287274278204,
+        "join_community": 0.5042969499949659,
+        "leave_community": 0.19573314783180712,
+        "do_nothing": 0.03697495180920392,
+        "stop": 0.05927283946530209
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.5,
+      "temperature": 1.0,
+      "action": "join_community",
+      "token_id": 5799,
+      "raw_scores": {
+        "post": 26.5,
+        "reply": 20.0,
+        "react": 19.25,
+        "unreact": 14.625,
+        "reshare": 17.625,
+        "follow": 18.5,
+        "unfollow": 11.6875,
+        "join_community": 23.0,
+        "leave_community": 16.625,
+        "do_nothing": 20.125,
+        "stop": 17.5
+      },
+      "expected_probabilities": {
+        "post": 0.04206030440091711,
+        "reply": 0.0030135286837340057,
+        "react": 0.010323618663830619,
+        "unreact": 0.011559603972736771,
+        "reshare": 0.05352769554496117,
+        "follow": 0.06658449142720299,
+        "unfollow": 0.016652875385088566,
+        "join_community": 0.5042970241575184,
+        "leave_community": 0.1957330442132582,
+        "do_nothing": 0.0369749630214131,
+        "stop": 0.05927285052933893
+      },
+      "backend_reported_probabilities": {
+        "post": 0.04206032904999842,
+        "reply": 0.003013529519803965,
+        "react": 0.010323617981933814,
+        "unreact": 0.011559610443319896,
+        "reshare": 0.05352771637431421,
+        "follow": 0.06658443478656868,
+        "unfollow": 0.01665287274278204,
+        "join_community": 0.5042969499949659,
+        "leave_community": 0.19573314783180712,
+        "do_nothing": 0.03697495180920392,
+        "stop": 0.05927283946530209
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 1.0,
+      "temperature": 0.7,
+      "action": "join_community",
+      "token_id": 5799,
+      "raw_scores": {
+        "post": 26.5,
+        "reply": 20.0,
+        "react": 19.25,
+        "unreact": 14.625,
+        "reshare": 17.625,
+        "follow": 18.5,
+        "unfollow": 11.6875,
+        "join_community": 23.0,
+        "leave_community": 16.625,
+        "do_nothing": 20.125,
+        "stop": 17.5
+      },
+      "expected_probabilities": {
+        "post": 0.044564887129406566,
+        "reply": 0.00011438488805488991,
+        "react": 0.0008949332448182255,
+        "unreact": 0.0008415383416997613,
+        "reshare": 0.014435607893703552,
+        "follow": 0.018614137236354064,
+        "unfollow": 0.0009979951078266844,
+        "join_community": 0.800812441594922,
+        "leave_community": 0.10723431451054918,
+        "do_nothing": 0.0034440027111171997,
+        "stop": 0.008045757341547825
+      },
+      "backend_reported_probabilities": {
+        "post": 0.04456485190878869,
+        "reply": 0.0001143848904660612,
+        "react": 0.0008949317793607234,
+        "unreact": 0.0008415384317242507,
+        "reshare": 0.014435590365834165,
+        "follow": 0.018614104138363504,
+        "unfollow": 0.0009979953838097667,
+        "join_community": 0.8008125392494361,
+        "leave_community": 0.10723431562311111,
+        "do_nothing": 0.003443998680448867,
+        "stop": 0.008045749548656823
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 1.0,
+      "temperature": 1.0,
+      "action": "join_community",
+      "token_id": 5799,
+      "raw_scores": {
+        "post": 26.5,
+        "reply": 20.0,
+        "react": 19.25,
+        "unreact": 14.625,
+        "reshare": 17.625,
+        "follow": 18.5,
+        "unfollow": 11.6875,
+        "join_community": 23.0,
+        "leave_community": 16.625,
+        "do_nothing": 20.125,
+        "stop": 17.5
+      },
+      "expected_probabilities": {
+        "post": 0.044564887129406566,
+        "reply": 0.00011438488805488991,
+        "react": 0.0008949332448182255,
+        "unreact": 0.0008415383416997613,
+        "reshare": 0.014435607893703552,
+        "follow": 0.018614137236354064,
+        "unfollow": 0.0009979951078266844,
+        "join_community": 0.800812441594922,
+        "leave_community": 0.10723431451054918,
+        "do_nothing": 0.0034440027111171997,
+        "stop": 0.008045757341547825
+      },
+      "backend_reported_probabilities": {
+        "post": 0.04456485190878869,
+        "reply": 0.0001143848904660612,
+        "react": 0.0008949317793607234,
+        "unreact": 0.0008415384317242507,
+        "reshare": 0.014435590365834165,
+        "follow": 0.018614104138363504,
+        "unfollow": 0.0009979953838097667,
+        "join_community": 0.8008125392494361,
+        "leave_community": 0.10723431562311111,
+        "do_nothing": 0.003443998680448867,
+        "stop": 0.008045749548656823
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.0,
+      "temperature": 0.7,
+      "action": "stop",
+      "token_id": 9215,
+      "raw_scores": {
+        "post": 22.375,
+        "reply": 24.5,
+        "react": 21.875,
+        "unreact": 17.75,
+        "reshare": 16.875,
+        "follow": 19.25,
+        "unfollow": 13.3125,
+        "join_community": 18.25,
+        "leave_community": 15.25,
+        "do_nothing": 21.75,
+        "stop": 20.125
+      },
+      "expected_probabilities": {
+        "post": 0.015151515151515157,
+        "reply": 0.030303030303030304,
+        "react": 0.04545454545454546,
+        "unreact": 0.060606060606060615,
+        "reshare": 0.07575757575757576,
+        "follow": 0.0909090909090909,
+        "unfollow": 0.10606060606060606,
+        "join_community": 0.12121212121212123,
+        "leave_community": 0.13636363636363635,
+        "do_nothing": 0.15151515151515155,
+        "stop": 0.16666666666666669
+      },
+      "backend_reported_probabilities": {
+        "post": 0.015151514636604102,
+        "reply": 0.030303029330925,
+        "react": 0.04545454481136172,
+        "unreact": 0.06060605877728359,
+        "reshare": 0.07575757546111005,
+        "follow": 0.09090908979587382,
+        "unfollow": 0.10606060949043265,
+        "join_community": 0.12121211778543436,
+        "leave_community": 0.13636363713873345,
+        "do_nothing": 0.15151515121080408,
+        "stop": 0.1666666715614372
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.0,
+      "temperature": 1.0,
+      "action": "stop",
+      "token_id": 9215,
+      "raw_scores": {
+        "post": 22.375,
+        "reply": 24.5,
+        "react": 21.875,
+        "unreact": 17.75,
+        "reshare": 16.875,
+        "follow": 19.25,
+        "unfollow": 13.3125,
+        "join_community": 18.25,
+        "leave_community": 15.25,
+        "do_nothing": 21.75,
+        "stop": 20.125
+      },
+      "expected_probabilities": {
+        "post": 0.015151515151515157,
+        "reply": 0.030303030303030304,
+        "react": 0.04545454545454546,
+        "unreact": 0.060606060606060615,
+        "reshare": 0.07575757575757576,
+        "follow": 0.0909090909090909,
+        "unfollow": 0.10606060606060606,
+        "join_community": 0.12121212121212123,
+        "leave_community": 0.13636363636363635,
+        "do_nothing": 0.15151515151515155,
+        "stop": 0.16666666666666669
+      },
+      "backend_reported_probabilities": {
+        "post": 0.015151514636604102,
+        "reply": 0.030303029330925,
+        "react": 0.04545454481136172,
+        "unreact": 0.06060605877728359,
+        "reshare": 0.07575757546111005,
+        "follow": 0.09090908979587382,
+        "unfollow": 0.10606060949043265,
+        "join_community": 0.12121211778543436,
+        "leave_community": 0.13636363713873345,
+        "do_nothing": 0.15151515121080408,
+        "stop": 0.1666666715614372
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.15,
+      "temperature": 0.7,
+      "action": "stop",
+      "token_id": 9215,
+      "raw_scores": {
+        "post": 22.375,
+        "reply": 24.5,
+        "react": 21.875,
+        "unreact": 17.75,
+        "reshare": 16.875,
+        "follow": 19.25,
+        "unfollow": 13.3125,
+        "join_community": 18.25,
+        "leave_community": 15.25,
+        "do_nothing": 21.75,
+        "stop": 20.125
+      },
+      "expected_probabilities": {
+        "post": 0.012359237631462688,
+        "reply": 0.03320030251053375,
+        "react": 0.048160122900642366,
+        "unreact": 0.06568256265191479,
+        "reshare": 0.06800551088858137,
+        "follow": 0.1033060129154089,
+        "unfollow": 0.08658134884724333,
+        "join_community": 0.10164447192522096,
+        "leave_community": 0.1378622730121422,
+        "do_nothing": 0.1411826320768906,
+        "stop": 0.20201552463995912
+      },
+      "backend_reported_probabilities": {
+        "post": 0.01235923723683406,
+        "reply": 0.033200306336578375,
+        "react": 0.048160126388797825,
+        "unreact": 0.06568256021191908,
+        "reshare": 0.06800550613138999,
+        "follow": 0.10330600114507074,
+        "unfollow": 0.08658135759427664,
+        "join_community": 0.10164446611868161,
+        "leave_community": 0.13786228652965843,
+        "do_nothing": 0.1411826334564556,
+        "stop": 0.2020155188503376
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.15,
+      "temperature": 1.0,
+      "action": "stop",
+      "token_id": 9215,
+      "raw_scores": {
+        "post": 22.375,
+        "reply": 24.5,
+        "react": 21.875,
+        "unreact": 17.75,
+        "reshare": 16.875,
+        "follow": 19.25,
+        "unfollow": 13.3125,
+        "join_community": 18.25,
+        "leave_community": 15.25,
+        "do_nothing": 21.75,
+        "stop": 20.125
+      },
+      "expected_probabilities": {
+        "post": 0.012359237631462688,
+        "reply": 0.03320030251053375,
+        "react": 0.048160122900642366,
+        "unreact": 0.06568256265191479,
+        "reshare": 0.06800551088858137,
+        "follow": 0.1033060129154089,
+        "unfollow": 0.08658134884724333,
+        "join_community": 0.10164447192522096,
+        "leave_community": 0.1378622730121422,
+        "do_nothing": 0.1411826320768906,
+        "stop": 0.20201552463995912
+      },
+      "backend_reported_probabilities": {
+        "post": 0.012359237439951506,
+        "reply": 0.03320030688220763,
+        "react": 0.048160127180283716,
+        "unreact": 0.0656825612913768,
+        "reshare": 0.06800550724902407,
+        "follow": 0.10330600284284956,
+        "unfollow": 0.0865813590171949,
+        "join_community": 0.10164446778915398,
+        "leave_community": 0.13786227236088677,
+        "do_nothing": 0.14118263577671658,
+        "stop": 0.20201552217035448
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.5,
+      "temperature": 0.7,
+      "action": "stop",
+      "token_id": 9215,
+      "raw_scores": {
+        "post": 22.375,
+        "reply": 24.5,
+        "react": 21.875,
+        "unreact": 17.75,
+        "reshare": 16.875,
+        "follow": 19.25,
+        "unfollow": 13.3125,
+        "join_community": 18.25,
+        "leave_community": 15.25,
+        "do_nothing": 21.75,
+        "stop": 20.125
+      },
+      "expected_probabilities": {
+        "post": 0.0071534993883122224,
+        "reply": 0.03824867681768903,
+        "react": 0.051312356913449556,
+        "unreact": 0.07377455276105618,
+        "reshare": 0.04921490122444622,
+        "follow": 0.12960209427819952,
+        "unfollow": 0.05020326938069513,
+        "join_community": 0.06275025755674844,
+        "leave_community": 0.1316634395102796,
+        "do_nothing": 0.11146807899417731,
+        "stop": 0.29460887317494666
+      },
+      "backend_reported_probabilities": {
+        "post": 0.007153500728072616,
+        "reply": 0.038248690415941616,
+        "react": 0.05131235753079742,
+        "unreact": 0.07377459981753011,
+        "reshare": 0.049214924218414745,
+        "follow": 0.12960199415088267,
+        "unfollow": 0.05020326533499389,
+        "join_community": 0.06275025322836271,
+        "leave_community": 0.13166351949192606,
+        "do_nothing": 0.11146805389662565,
+        "stop": 0.2946088411864522
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.5,
+      "temperature": 1.0,
+      "action": "stop",
+      "token_id": 9215,
+      "raw_scores": {
+        "post": 22.375,
+        "reply": 24.5,
+        "react": 21.875,
+        "unreact": 17.75,
+        "reshare": 16.875,
+        "follow": 19.25,
+        "unfollow": 13.3125,
+        "join_community": 18.25,
+        "leave_community": 15.25,
+        "do_nothing": 21.75,
+        "stop": 20.125
+      },
+      "expected_probabilities": {
+        "post": 0.0071534993883122224,
+        "reply": 0.03824867681768903,
+        "react": 0.051312356913449556,
+        "unreact": 0.07377455276105618,
+        "reshare": 0.04921490122444622,
+        "follow": 0.12960209427819952,
+        "unfollow": 0.05020326938069513,
+        "join_community": 0.06275025755674844,
+        "leave_community": 0.1316634395102796,
+        "do_nothing": 0.11146807899417731,
+        "stop": 0.29460887317494666
+      },
+      "backend_reported_probabilities": {
+        "post": 0.007153500728072616,
+        "reply": 0.038248690415941616,
+        "react": 0.05131235753079742,
+        "unreact": 0.07377459981753011,
+        "reshare": 0.049214924218414745,
+        "follow": 0.12960199415088267,
+        "unfollow": 0.05020326533499389,
+        "join_community": 0.06275025322836271,
+        "leave_community": 0.13166351949192606,
+        "do_nothing": 0.11146805389662565,
+        "stop": 0.2946088411864522
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 1.0,
+      "temperature": 0.7,
+      "action": "stop",
+      "token_id": 9215,
+      "raw_scores": {
+        "post": 22.375,
+        "reply": 24.5,
+        "react": 21.875,
+        "unreact": 17.75,
+        "reshare": 16.875,
+        "follow": 19.25,
+        "unfollow": 13.3125,
+        "join_community": 18.25,
+        "leave_community": 15.25,
+        "do_nothing": 21.75,
+        "stop": 20.125
+      },
+      "expected_probabilities": {
+        "post": 0.0028091855227281317,
+        "reply": 0.040155604541380445,
+        "react": 0.04817991228530971,
+        "unreact": 0.07469585664756667,
+        "reshare": 0.026592952886773297,
+        "follow": 0.15367956461478066,
+        "unfollow": 0.019765567767632174,
+        "join_community": 0.027019939440481044,
+        "leave_community": 0.1057380302473343,
+        "do_nothing": 0.06820942151383541,
+        "stop": 0.43315396453217825
+      },
+      "backend_reported_probabilities": {
+        "post": 0.0028091825947701167,
+        "reply": 0.04015559527030932,
+        "react": 0.04817982125117254,
+        "unreact": 0.07469584581801103,
+        "reshare": 0.02659291389702433,
+        "follow": 0.15367954575500425,
+        "unfollow": 0.019765568253457086,
+        "join_community": 0.027019935927515667,
+        "leave_community": 0.10573800470282031,
+        "do_nothing": 0.0682093244994447,
+        "stop": 0.43315426203047064
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 1.0,
+      "temperature": 1.0,
+      "action": "stop",
+      "token_id": 9215,
+      "raw_scores": {
+        "post": 22.375,
+        "reply": 24.5,
+        "react": 21.875,
+        "unreact": 17.75,
+        "reshare": 16.875,
+        "follow": 19.25,
+        "unfollow": 13.3125,
+        "join_community": 18.25,
+        "leave_community": 15.25,
+        "do_nothing": 21.75,
+        "stop": 20.125
+      },
+      "expected_probabilities": {
+        "post": 0.0028091855227281317,
+        "reply": 0.040155604541380445,
+        "react": 0.04817991228530971,
+        "unreact": 0.07469585664756667,
+        "reshare": 0.026592952886773297,
+        "follow": 0.15367956461478066,
+        "unfollow": 0.019765567767632174,
+        "join_community": 0.027019939440481044,
+        "leave_community": 0.1057380302473343,
+        "do_nothing": 0.06820942151383541,
+        "stop": 0.43315396453217825
+      },
+      "backend_reported_probabilities": {
+        "post": 0.002809185739079334,
+        "reply": 0.04015564021634046,
+        "react": 0.048179875178694515,
+        "unreact": 0.07469592942483567,
+        "reshare": 0.026592943662388985,
+        "follow": 0.15367942464751513,
+        "unfollow": 0.019765590376995296,
+        "join_community": 0.027019966170844734,
+        "leave_community": 0.1057381230550355,
+        "do_nothing": 0.06820940084592649,
+        "stop": 0.43315392068234376
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.0,
+      "temperature": 0.7,
+      "action": "react",
+      "token_id": 2840,
+      "raw_scores": {
+        "post": 22.625,
+        "reply": 19.125,
+        "react": 23.75,
+        "unreact": 19.375,
+        "reshare": 18.75,
+        "follow": 20.375,
+        "unfollow": 17.125,
+        "join_community": 19.75,
+        "leave_community": 17.25,
+        "do_nothing": 24.625,
+        "stop": 20.625
+      },
+      "expected_probabilities": {
+        "post": 0.015151515151515157,
+        "reply": 0.030303030303030304,
+        "react": 0.04545454545454546,
+        "unreact": 0.060606060606060615,
+        "reshare": 0.07575757575757576,
+        "follow": 0.0909090909090909,
+        "unfollow": 0.10606060606060606,
+        "join_community": 0.12121212121212123,
+        "leave_community": 0.13636363636363635,
+        "do_nothing": 0.15151515151515155,
+        "stop": 0.16666666666666669
+      },
+      "backend_reported_probabilities": {
+        "post": 0.015151514636604102,
+        "reply": 0.030303029330925,
+        "react": 0.04545454481136172,
+        "unreact": 0.06060605877728359,
+        "reshare": 0.07575757546111005,
+        "follow": 0.09090908979587382,
+        "unfollow": 0.10606060949043265,
+        "join_community": 0.12121211778543436,
+        "leave_community": 0.13636363713873345,
+        "do_nothing": 0.15151515121080408,
+        "stop": 0.1666666715614372
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.0,
+      "temperature": 1.0,
+      "action": "react",
+      "token_id": 2840,
+      "raw_scores": {
+        "post": 22.625,
+        "reply": 19.125,
+        "react": 23.75,
+        "unreact": 19.375,
+        "reshare": 18.75,
+        "follow": 20.375,
+        "unfollow": 17.125,
+        "join_community": 19.75,
+        "leave_community": 17.25,
+        "do_nothing": 24.625,
+        "stop": 20.625
+      },
+      "expected_probabilities": {
+        "post": 0.015151515151515157,
+        "reply": 0.030303030303030304,
+        "react": 0.04545454545454546,
+        "unreact": 0.060606060606060615,
+        "reshare": 0.07575757575757576,
+        "follow": 0.0909090909090909,
+        "unfollow": 0.10606060606060606,
+        "join_community": 0.12121212121212123,
+        "leave_community": 0.13636363636363635,
+        "do_nothing": 0.15151515151515155,
+        "stop": 0.16666666666666669
+      },
+      "backend_reported_probabilities": {
+        "post": 0.015151514636604102,
+        "reply": 0.030303029330925,
+        "react": 0.04545454481136172,
+        "unreact": 0.06060605877728359,
+        "reshare": 0.07575757546111005,
+        "follow": 0.09090908979587382,
+        "unfollow": 0.10606060949043265,
+        "join_community": 0.12121211778543436,
+        "leave_community": 0.13636363713873345,
+        "do_nothing": 0.15151515121080408,
+        "stop": 0.1666666715614372
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.15,
+      "temperature": 0.7,
+      "action": "react",
+      "token_id": 2840,
+      "raw_scores": {
+        "post": 22.625,
+        "reply": 19.125,
+        "react": 23.75,
+        "unreact": 19.375,
+        "reshare": 18.75,
+        "follow": 20.375,
+        "unfollow": 17.125,
+        "join_community": 19.75,
+        "leave_community": 17.25,
+        "do_nothing": 24.625,
+        "stop": 20.625
+      },
+      "expected_probabilities": {
+        "post": 0.009950862747948024,
+        "reply": 0.011496750998320066,
+        "react": 0.04947843107937948,
+        "unreact": 0.06499686042270685,
+        "reshare": 0.0698670555816581,
+        "follow": 0.0948409301420137,
+        "unfollow": 0.11895138818646973,
+        "join_community": 0.0987149733984002,
+        "leave_community": 0.14431676651194406,
+        "do_nothing": 0.1685209039467014,
+        "stop": 0.16886507698445835
+      },
+      "backend_reported_probabilities": {
+        "post": 0.009950863973495273,
+        "reply": 0.01149675136520917,
+        "react": 0.049478423462091844,
+        "unreact": 0.06499686498923857,
+        "reshare": 0.06986705153534725,
+        "follow": 0.094840913694359,
+        "unfollow": 0.11895141297984137,
+        "join_community": 0.09871495953340838,
+        "leave_community": 0.1443167927220414,
+        "do_nothing": 0.16852088351504974,
+        "stop": 0.16886508222991803
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.15,
+      "temperature": 1.0,
+      "action": "react",
+      "token_id": 2840,
+      "raw_scores": {
+        "post": 22.625,
+        "reply": 19.125,
+        "react": 23.75,
+        "unreact": 19.375,
+        "reshare": 18.75,
+        "follow": 20.375,
+        "unfollow": 17.125,
+        "join_community": 19.75,
+        "leave_community": 17.25,
+        "do_nothing": 24.625,
+        "stop": 20.625
+      },
+      "expected_probabilities": {
+        "post": 0.009950862747948024,
+        "reply": 0.011496750998320066,
+        "react": 0.04947843107937948,
+        "unreact": 0.06499686042270685,
+        "reshare": 0.0698670555816581,
+        "follow": 0.0948409301420137,
+        "unfollow": 0.11895138818646973,
+        "join_community": 0.0987149733984002,
+        "leave_community": 0.14431676651194406,
+        "do_nothing": 0.1685209039467014,
+        "stop": 0.16886507698445835
+      },
+      "backend_reported_probabilities": {
+        "post": 0.009950863860991614,
+        "reply": 0.011496751235227832,
+        "react": 0.04947842290269283,
+        "unreact": 0.06499686425438933,
+        "reshare": 0.06986705074543607,
+        "follow": 0.09484092392801387,
+        "unfollow": 0.1189514116349864,
+        "join_community": 0.09871495841734511,
+        "leave_community": 0.14431679109040751,
+        "do_nothing": 0.16852088160976633,
+        "stop": 0.16886508032074315
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.5,
+      "temperature": 0.7,
+      "action": "react",
+      "token_id": 2840,
+      "raw_scores": {
+        "post": 22.625,
+        "reply": 19.125,
+        "react": 23.75,
+        "unreact": 19.375,
+        "reshare": 18.75,
+        "follow": 20.375,
+        "unfollow": 17.125,
+        "join_community": 19.75,
+        "leave_community": 17.25,
+        "do_nothing": 24.625,
+        "stop": 20.625
+      },
+      "expected_probabilities": {
+        "post": 0.0034682297914975487,
+        "reply": 0.0011136597032626173,
+        "react": 0.05606289884067255,
+        "unreact": 0.07113336632079058,
+        "reshare": 0.05377125890852658,
+        "follow": 0.09732068910182622,
+        "unfollow": 0.14451348240118336,
+        "join_community": 0.05683801260120881,
+        "leave_community": 0.1531306718423358,
+        "do_nothing": 0.20079428338143646,
+        "stop": 0.16185344710725932
+      },
+      "backend_reported_probabilities": {
+        "post": 0.003468232050365076,
+        "reply": 0.0011136595538795576,
+        "react": 0.056062898796334464,
+        "unreact": 0.07113341078053087,
+        "reshare": 0.053771283341839025,
+        "follow": 0.09732061266646222,
+        "unfollow": 0.14451346890240355,
+        "join_community": 0.056838007951858734,
+        "leave_community": 0.15313076290124283,
+        "do_nothing": 0.20079423559708706,
+        "stop": 0.1618534274579966
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.5,
+      "temperature": 1.0,
+      "action": "react",
+      "token_id": 2840,
+      "raw_scores": {
+        "post": 22.625,
+        "reply": 19.125,
+        "react": 23.75,
+        "unreact": 19.375,
+        "reshare": 18.75,
+        "follow": 20.375,
+        "unfollow": 17.125,
+        "join_community": 19.75,
+        "leave_community": 17.25,
+        "do_nothing": 24.625,
+        "stop": 20.625
+      },
+      "expected_probabilities": {
+        "post": 0.0034682297914975487,
+        "reply": 0.0011136597032626173,
+        "react": 0.05606289884067255,
+        "unreact": 0.07113336632079058,
+        "reshare": 0.05377125890852658,
+        "follow": 0.09732068910182622,
+        "unfollow": 0.14451348240118336,
+        "join_community": 0.05683801260120881,
+        "leave_community": 0.1531306718423358,
+        "do_nothing": 0.20079428338143646,
+        "stop": 0.16185344710725932
+      },
+      "backend_reported_probabilities": {
+        "post": 0.0034682304004775015,
+        "reply": 0.0011136600861643,
+        "react": 0.056062898859278926,
+        "unreact": 0.07113341086039571,
+        "reshare": 0.05377128340221059,
+        "follow": 0.09732061277572866,
+        "unfollow": 0.14451346906465565,
+        "join_community": 0.05683800801567345,
+        "leave_community": 0.15313076307316997,
+        "do_nothing": 0.20079423582252823,
+        "stop": 0.1618534276397171
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 1.0,
+      "temperature": 0.7,
+      "action": "react",
+      "token_id": 2840,
+      "raw_scores": {
+        "post": 22.625,
+        "reply": 19.125,
+        "react": 23.75,
+        "unreact": 19.375,
+        "reshare": 18.75,
+        "follow": 20.375,
+        "unfollow": 17.125,
+        "join_community": 19.75,
+        "leave_community": 17.25,
+        "do_nothing": 24.625,
+        "stop": 20.625
+      },
+      "expected_probabilities": {
+        "post": 0.000712250054984067,
+        "reply": 3.671907884548047e-05,
+        "react": 0.06203640290967929,
+        "unreact": 0.07490373860226415,
+        "reshare": 0.0342410573533775,
+        "follow": 0.09347077917136766,
+        "unfollow": 0.17665887304626496,
+        "join_community": 0.023911374615842668,
+        "leave_community": 0.15427609196042524,
+        "do_nothing": 0.23873684550884086,
+        "stop": 0.14101586769810817
+      },
+      "backend_reported_probabilities": {
+        "post": 0.0007122504699750397,
+        "reply": 3.671913003373415e-05,
+        "react": 0.06203626817391577,
+        "unreact": 0.07490370658823536,
+        "reshare": 0.034241062789445095,
+        "follow": 0.09347056302133591,
+        "unfollow": 0.17665916444666574,
+        "join_community": 0.023911410361329072,
+        "leave_community": 0.1542763053776675,
+        "do_nothing": 0.23873689388298466,
+        "stop": 0.14101565575841213
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 1.0,
+      "temperature": 1.0,
+      "action": "react",
+      "token_id": 2840,
+      "raw_scores": {
+        "post": 22.625,
+        "reply": 19.125,
+        "react": 23.75,
+        "unreact": 19.375,
+        "reshare": 18.75,
+        "follow": 20.375,
+        "unfollow": 17.125,
+        "join_community": 19.75,
+        "leave_community": 17.25,
+        "do_nothing": 24.625,
+        "stop": 20.625
+      },
+      "expected_probabilities": {
+        "post": 0.000712250054984067,
+        "reply": 3.671907884548047e-05,
+        "react": 0.06203640290967929,
+        "unreact": 0.07490373860226415,
+        "reshare": 0.0342410573533775,
+        "follow": 0.09347077917136766,
+        "unfollow": 0.17665887304626496,
+        "join_community": 0.023911374615842668,
+        "leave_community": 0.15427609196042524,
+        "do_nothing": 0.23873684550884086,
+        "stop": 0.14101586769810817
+      },
+      "backend_reported_probabilities": {
+        "post": 0.0007122499653887327,
+        "reply": 3.671910402045508e-05,
+        "react": 0.06203634254979848,
+        "unreact": 0.0749037963910146,
+        "reshare": 0.034241038531726574,
+        "follow": 0.09347067508409913,
+        "unfollow": 0.17665903929435042,
+        "join_community": 0.02391139342154348,
+        "leave_community": 0.1542761960822518,
+        "do_nothing": 0.23873672475235894,
+        "stop": 0.14101582482344746
+      }
+    }
+  ]
+}

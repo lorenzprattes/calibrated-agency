@@ -1,0 +1,65 @@
+{
+  "scope": "16 fixed synthetic prompts; maxima over both action sets",
+  "backends": {
+    "transformers": {
+      "contexts": 16,
+      "api_prompt_ids_equal": true,
+      "api_action_ids_equal": true,
+      "vs_adapter": {
+        "repeat": {
+          "max_absolute_score_error": 0.0,
+          "max_log_odds_error": 0.0
+        },
+        "direct": {
+          "max_absolute_score_error": 0.0,
+          "max_log_odds_error": 0.0
+        },
+        "last_token_only": {
+          "max_absolute_score_error": 0.0,
+          "max_log_odds_error": 0.0
+        },
+        "no_cache": {
+          "max_absolute_score_error": 0.0,
+          "max_log_odds_error": 0.0
+        },
+        "eager_attention": {
+          "max_absolute_score_error": 0.125,
+          "max_log_odds_error": 0.25
+        },
+        "fp32_head": {
+          "max_absolute_score_error": 0.0623016357421875,
+          "max_log_odds_error": 0.12033462524414062
+        },
+        "fp32_head_rounded_bf16": {
+          "max_absolute_score_error": 0.0,
+          "max_log_odds_error": 0.0
+        }
+      }
+    },
+    "vllm-native": {
+      "contexts": 16,
+      "api_prompt_ids_equal": true,
+      "api_action_ids_equal": true,
+      "vs_adapter": {
+        "repeat": {
+          "max_absolute_score_error": 0.0,
+          "max_log_odds_error": 0.0
+        },
+        "direct": {
+          "max_absolute_score_error": 0.0,
+          "max_log_odds_error": 0.0
+        },
+        "batch": {
+          "max_absolute_score_error": 0.25,
+          "max_log_odds_error": 0.3125
+        }
+      },
+      "runtime_prompt_ids_equal": true
+    }
+  },
+  "cross_runtime": {
+    "adapter": 0.25,
+    "eager_attention": 0.375,
+    "fp32_head": 0.23517799377441406
+  }
+}

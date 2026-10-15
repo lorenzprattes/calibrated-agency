@@ -1,0 +1,1430 @@
+{
+  "mode": "vllm-native",
+  "model": "Qwen/Qwen3.5-4B",
+  "python": "3.12.13",
+  "packages": {
+    "calibrated-agency": "0.2.0a1",
+    "vllm": "0.26.0",
+    "transformers": "5.14.1",
+    "torch": "2.11.0+cu130"
+  },
+  "score_mode": "processed_logprobs",
+  "contexts": [
+    "A new topic has not been discussed yet and you have a distinct argument to introduce.",
+    "Another participant directly asked you a specific question in an existing discussion.",
+    "The feed contains a broad announcement and no comment is directed at you.",
+    "A participant made a factual claim you can correct with a short reply.",
+    "Several discussions repeat familiar points, while you have a new question for everyone.",
+    "An existing thread contains a nuanced argument that merits a direct response.",
+    "The feed is quiet and you have a self-contained observation to share.",
+    "A reply to your earlier message asks for clarification."
+  ],
+  "scores": [
+    {
+      "context_id": 0,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "A new topic has not been discussed yet and you have a distinct argument to introduce."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260805
+      },
+      "raw_scores": {
+        "post": -0.003600069787353277,
+        "comment": -5.628600120544434
+      },
+      "probabilities": {
+        "post": 0.9964063976003252,
+        "comment": 0.003593602399674796
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "post",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 1,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 1,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "Another participant directly asked you a specific question in an existing discussion."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260806
+      },
+      "raw_scores": {
+        "post": -1.6004126071929932,
+        "comment": -0.22541262209415436
+      },
+      "probabilities": {
+        "post": 0.20181322466072713,
+        "comment": 0.798186775339273
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "comment",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 1,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 2,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "The feed contains a broad announcement and no comment is directed at you."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260807
+      },
+      "raw_scores": {
+        "post": -0.25192904472351074,
+        "comment": -1.5019290447235107
+      },
+      "probabilities": {
+        "post": 0.7772998611746911,
+        "comment": 0.22270013882530884
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "comment",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 1,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 3,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "A participant made a factual claim you can correct with a short reply."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260808
+      },
+      "raw_scores": {
+        "post": -2.2378222942352295,
+        "comment": -0.11282224208116531
+      },
+      "probabilities": {
+        "post": 0.10669058897496682,
+        "comment": 0.8933094110250331
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "comment",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 1,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 4,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "Several discussions repeat familiar points, while you have a new question for everyone."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260809
+      },
+      "raw_scores": {
+        "post": -0.42870065569877625,
+        "comment": -1.0537006855010986
+      },
+      "probabilities": {
+        "post": 0.6513548714339145,
+        "comment": 0.34864512856608554
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "post",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 1,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 5,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "An existing thread contains a nuanced argument that merits a direct response."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260810
+      },
+      "raw_scores": {
+        "post": -0.9740769863128662,
+        "comment": -0.4740769863128662
+      },
+      "probabilities": {
+        "post": 0.3775406687981454,
+        "comment": 0.6224593312018546
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "comment",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 1,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 6,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "The feed is quiet and you have a self-contained observation to share."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260811
+      },
+      "raw_scores": {
+        "post": -0.2014133334159851,
+        "comment": -1.7014133930206299
+      },
+      "probabilities": {
+        "post": 0.8175744850834649,
+        "comment": 0.18242551491653522
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "post",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 1,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 7,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "A reply to your earlier message asks for clarification."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260812
+      },
+      "raw_scores": {
+        "post": -2.3502066135406494,
+        "comment": -0.10020658373832703
+      },
+      "probabilities": {
+        "post": 0.09534946232842245,
+        "comment": 0.9046505376715775
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "post",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 1,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    }
+  ],
+  "batch_scores": [
+    {
+      "context_id": 0,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "A new topic has not been discussed yet and you have a distinct argument to introduce."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260805
+      },
+      "raw_scores": {
+        "post": -0.003600069787353277,
+        "comment": -5.628600120544434
+      },
+      "probabilities": {
+        "post": 0.9964063976003252,
+        "comment": 0.003593602399674796
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "post",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 8,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 1,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "Another participant directly asked you a specific question in an existing discussion."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260806
+      },
+      "raw_scores": {
+        "post": -1.7014133930206299,
+        "comment": -0.2014133334159851
+      },
+      "probabilities": {
+        "post": 0.18242551491653522,
+        "comment": 0.8175744850834649
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "comment",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 8,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 2,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "The feed contains a broad announcement and no comment is directed at you."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260807
+      },
+      "raw_scores": {
+        "post": -0.28115010261535645,
+        "comment": -1.4061501026153564
+      },
+      "probabilities": {
+        "post": 0.7549149868676283,
+        "comment": 0.2450850131323717
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "comment",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 8,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 3,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "A participant made a factual claim you can correct with a short reply."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260808
+      },
+      "raw_scores": {
+        "post": -2.2378222942352295,
+        "comment": -0.11282224208116531
+      },
+      "probabilities": {
+        "post": 0.10669058897496682,
+        "comment": 0.8933094110250331
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "comment",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 8,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 4,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "Several discussions repeat familiar points, while you have a new question for everyone."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260809
+      },
+      "raw_scores": {
+        "post": -0.42870065569877625,
+        "comment": -1.0537006855010986
+      },
+      "probabilities": {
+        "post": 0.6513548714339145,
+        "comment": 0.34864512856608554
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "post",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 8,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 5,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "An existing thread contains a nuanced argument that merits a direct response."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260810
+      },
+      "raw_scores": {
+        "post": -0.8981232643127441,
+        "comment": -0.5231232643127441
+      },
+      "probabilities": {
+        "post": 0.4073334000459302,
+        "comment": 0.5926665999540697
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "comment",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 8,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 6,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "The feed is quiet and you have a self-contained observation to share."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260811
+      },
+      "raw_scores": {
+        "post": -0.2014133334159851,
+        "comment": -1.7014133930206299
+      },
+      "probabilities": {
+        "post": 0.8175744850834649,
+        "comment": 0.18242551491653522
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "post",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 8,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    },
+    {
+      "context_id": 7,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "A reply to your earlier message asks for clarification."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260812
+      },
+      "raw_scores": {
+        "post": -2.2378222942352295,
+        "comment": -0.11282224208116531
+      },
+      "probabilities": {
+        "post": 0.10669058897496682,
+        "comment": 0.8933094110250331
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "post",
+      "metadata": {
+        "backend": "vllm_native",
+        "model": "Qwen/Qwen3.5-4B",
+        "logprobs_mode": "processed_logprobs",
+        "batch_size": 8,
+        "token_resolution": "bare_label_exact_roundtrip_v1"
+      }
+    }
+  ],
+  "probability_mean_prior": {
+    "post": 0.5030036950068322,
+    "comment": 0.4969963049931678
+  },
+  "target": {
+    "post": 0.2,
+    "comment": 0.8
+  },
+  "core_corrections": [
+    {
+      "context_id": 0,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.3671770347096594,
+        "comment": 0.6328229652903405
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.8053694863450287,
+        "comment": 0.19463051365497128
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.9856094829825854,
+        "comment": 0.014390517017414686
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.16877323962493346,
+        "comment": 0.8312267603750665
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.11107553345210652,
+        "comment": 0.8889244665478935
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.05878365012986694,
+        "comment": 0.9412163498701331
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.23136910171542466,
+        "comment": 0.7686308982845753
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.3170630648510816,
+        "comment": 0.6829369351489184
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.46299049105610485,
+        "comment": 0.5370095089438951
+      }
+    },
+    {
+      "context_id": 3,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 3,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.1535731727242219,
+        "comment": 0.846426827275778
+      }
+    },
+    {
+      "context_id": 3,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.07908810759858087,
+        "comment": 0.920911892401419
+      }
+    },
+    {
+      "context_id": 3,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.02865623649515802,
+        "comment": 0.9713437635048421
+      }
+    },
+    {
+      "context_id": 4,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 4,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.21511801315233633,
+        "comment": 0.7848819868476637
+      }
+    },
+    {
+      "context_id": 4,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.25354352439591943,
+        "comment": 0.7464564756040806
+      }
+    },
+    {
+      "context_id": 4,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.31576368290373685,
+        "comment": 0.6842363170962631
+      }
+    },
+    {
+      "context_id": 5,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 5,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.1879941651797999,
+        "comment": 0.8120058348202002
+      }
+    },
+    {
+      "context_id": 5,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.16215209638426595,
+        "comment": 0.837847903615734
+      }
+    },
+    {
+      "context_id": 5,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.13029994954703544,
+        "comment": 0.8697000504529645
+      }
+    },
+    {
+      "context_id": 6,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 6,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.23810507387064403,
+        "comment": 0.7618949261293559
+      }
+    },
+    {
+      "context_id": 6,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.3447264013136592,
+        "comment": 0.6552735986863408
+      }
+    },
+    {
+      "context_id": 6,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.5254008080771274,
+        "comment": 0.4745991919228726
+      }
+    },
+    {
+      "context_id": 7,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 7,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.15115168935103376,
+        "comment": 0.8488483106489662
+      }
+    },
+    {
+      "context_id": 7,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.07465412278318319,
+        "comment": 0.9253458772168168
+      }
+    },
+    {
+      "context_id": 7,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.025374481363686165,
+        "comment": 0.9746255186363137
+      }
+    }
+  ],
+  "native_decisions": [
+    {
+      "context_id": 0,
+      "beta": 0.0,
+      "temperature": 0.7,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      },
+      "backend_reported_probabilities": {
+        "post": 0.19999997554865387,
+        "comment": 0.8000000244513461
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.0,
+      "temperature": 1.0,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      },
+      "backend_reported_probabilities": {
+        "post": 0.19999999462213913,
+        "comment": 0.800000005377861
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.15,
+      "temperature": 0.7,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.3671770347096594,
+        "comment": 0.6328229652903405
+      },
+      "backend_reported_probabilities": {
+        "post": 0.367177039640804,
+        "comment": 0.632822960359196
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.15,
+      "temperature": 1.0,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.3671770347096594,
+        "comment": 0.6328229652903405
+      },
+      "backend_reported_probabilities": {
+        "post": 0.367177039640804,
+        "comment": 0.632822960359196
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.5,
+      "temperature": 0.7,
+      "action": "post",
+      "token_id": 2134,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.8053694863450287,
+        "comment": 0.19463051365497128
+      },
+      "backend_reported_probabilities": {
+        "post": 0.8053695143984907,
+        "comment": 0.19463048560150945
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.5,
+      "temperature": 1.0,
+      "action": "post",
+      "token_id": 2134,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.8053694863450287,
+        "comment": 0.19463051365497128
+      },
+      "backend_reported_probabilities": {
+        "post": 0.8053695143984907,
+        "comment": 0.19463048560150945
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 1.0,
+      "temperature": 0.7,
+      "action": "post",
+      "token_id": 2134,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.9856094829825854,
+        "comment": 0.014390517017414686
+      },
+      "backend_reported_probabilities": {
+        "post": 0.9856095008340248,
+        "comment": 0.014390499165975165
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 1.0,
+      "temperature": 1.0,
+      "action": "post",
+      "token_id": 2134,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.9856094829825854,
+        "comment": 0.014390517017414686
+      },
+      "backend_reported_probabilities": {
+        "post": 0.9856095008340248,
+        "comment": 0.014390499165975165
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.0,
+      "temperature": 0.7,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      },
+      "backend_reported_probabilities": {
+        "post": 0.19999997554865387,
+        "comment": 0.8000000244513461
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.0,
+      "temperature": 1.0,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      },
+      "backend_reported_probabilities": {
+        "post": 0.19999999462213913,
+        "comment": 0.800000005377861
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.15,
+      "temperature": 0.7,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.16877323962493346,
+        "comment": 0.8312267603750665
+      },
+      "backend_reported_probabilities": {
+        "post": 0.16877321450825963,
+        "comment": 0.8312267854917404
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.15,
+      "temperature": 1.0,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.16877323962493346,
+        "comment": 0.8312267603750665
+      },
+      "backend_reported_probabilities": {
+        "post": 0.168773245865256,
+        "comment": 0.831226754134744
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.5,
+      "temperature": 0.7,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.11107553345210652,
+        "comment": 0.8889244665478935
+      },
+      "backend_reported_probabilities": {
+        "post": 0.11107556613514548,
+        "comment": 0.8889244338648545
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.5,
+      "temperature": 1.0,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.11107553345210652,
+        "comment": 0.8889244665478935
+      },
+      "backend_reported_probabilities": {
+        "post": 0.11107556613514548,
+        "comment": 0.8889244338648545
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 1.0,
+      "temperature": 0.7,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.05878365012986694,
+        "comment": 0.9412163498701331
+      },
+      "backend_reported_probabilities": {
+        "post": 0.05878362863871413,
+        "comment": 0.9412163713612859
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 1.0,
+      "temperature": 1.0,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.05878365012986694,
+        "comment": 0.9412163498701331
+      },
+      "backend_reported_probabilities": {
+        "post": 0.05878372716094174,
+        "comment": 0.9412162728390582
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.0,
+      "temperature": 0.7,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      },
+      "backend_reported_probabilities": {
+        "post": 0.19999997554865387,
+        "comment": 0.8000000244513461
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.0,
+      "temperature": 1.0,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      },
+      "backend_reported_probabilities": {
+        "post": 0.19999999462213913,
+        "comment": 0.800000005377861
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.15,
+      "temperature": 0.7,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.23136910171542466,
+        "comment": 0.7686308982845753
+      },
+      "backend_reported_probabilities": {
+        "post": 0.23136910684349923,
+        "comment": 0.7686308931565008
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.15,
+      "temperature": 1.0,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.23136910171542466,
+        "comment": 0.7686308982845753
+      },
+      "backend_reported_probabilities": {
+        "post": 0.23136910684349923,
+        "comment": 0.7686308931565008
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.5,
+      "temperature": 0.7,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.3170630648510816,
+        "comment": 0.6829369351489184
+      },
+      "backend_reported_probabilities": {
+        "post": 0.3170631090995191,
+        "comment": 0.6829368909004808
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.5,
+      "temperature": 1.0,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.3170630648510816,
+        "comment": 0.6829369351489184
+      },
+      "backend_reported_probabilities": {
+        "post": 0.3170631090995191,
+        "comment": 0.6829368909004808
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 1.0,
+      "temperature": 0.7,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.46299049105610485,
+        "comment": 0.5370095089438951
+      },
+      "backend_reported_probabilities": {
+        "post": 0.46299038614443566,
+        "comment": 0.5370096138555643
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 1.0,
+      "temperature": 1.0,
+      "action": "comment",
+      "token_id": 5989,
+      "raw_scores": null,
+      "expected_probabilities": {
+        "post": 0.46299049105610485,
+        "comment": 0.5370095089438951
+      },
+      "backend_reported_probabilities": {
+        "post": 0.4629908603691099,
+        "comment": 0.53700913963089
+      }
+    }
+  ]
+}

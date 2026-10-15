@@ -9,11 +9,13 @@ support vLLM and Transformers. Version `0.2.0a1` is an alpha; it is not publishe
 
 ## Install
 
-From a checkout:
+From GitHub:
 
 ```bash
-pip install .
+pip install 'calibrated-agency @ git+https://github.com/lorenzprattes/calibrated-agency.git'
 ```
+
+From a checkout, use `pip install .`. Pin a commit in the Git URL for reproducible deployments.
 
 For an optional model runtime, use `pip install '.[vllm]'`,
 `pip install '.[transformers]'`, or `pip install '.[all]'`. The combined extra lets vLLM
@@ -115,13 +117,17 @@ uv run mypy
 uv build
 ```
 
-The current package passed 104 tests on Python 3.10, 3.12, and 3.14, with 93.44% core
-branch coverage. The wheel was also tested in a fresh environment.
+The current suite passes 110 CPU tests. The earlier 104-test library snapshot also passed
+on Python 3.10, 3.12, and 3.14, with 93.44% core branch coverage and a fresh wheel install.
 
-[Earlier GPU runs](validation/gsc-2026-08-05/README.md) tested version 0.1.0 on Qwen3.5-4B
-and Llama-3.1-8B. vLLM API/native scores agreed within the chosen tolerances;
-vLLM/Transformers scores did not. Those results do not validate the updated adapters in
-0.2.0a1. Fresh model tests remain pending.
+[Current H200 benchmarks](validation/gsc-2026-10-15/README.md) test the updated adapters on
+Qwen3.5-4B with two and eleven actions. Correction checks pass, and API/native vLLM agree.
+Transformers and vLLM produce different model scores. Direct runtime calls reproduce those
+differences without adapter error on the tested prompts; attention and batching also affect
+scores. These are correctness checks, not evidence of behavioral validity.
+
+[Earlier GPU runs](validation/gsc-2026-08-05/README.md) cover version 0.1.0 on Qwen3.5-4B
+and Llama-3.1-8B.
 
 See [validation](docs/validation.md), [CPU results](validation/cpu-2026-10-14/README.md),
 and [DeSiRe integration](docs/project-alignment.md) for the tested scope and remaining work.

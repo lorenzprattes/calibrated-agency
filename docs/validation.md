@@ -77,7 +77,9 @@ parallelism settings; score mode; action labels and token IDs; decoding paramete
 and seeds. Keep the requests, responses, and input/output hashes needed to repeat it.
 
 The [historical GPU results](../validation/gsc-2026-08-05/README.md) cover version 0.1.0.
-Fresh model tests of the changed 0.2.0a1 adapters remain pending.
+The [current H200 benchmarks](../validation/gsc-2026-10-15/README.md) cover the updated
+0.2.0a1 adapters and trace their scores against direct runtime calls. Correction checks pass;
+cross-runtime and batch-dependent score differences remain.
 
 ## Source comparisons
 

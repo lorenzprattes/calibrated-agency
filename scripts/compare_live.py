@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import math
 from pathlib import Path
@@ -49,21 +50,19 @@ def compare_pair(
         first = reference_scores[context_id]
         second = candidate_scores[context_id]
         actions = tuple(first["raw_scores"])
-        if len(actions) != 2 or set(actions) != set(second["raw_scores"]):
-            raise ValueError("live comparison currently expects matching binary actions")
-        first_log_odds = first["raw_scores"][actions[0]] - first["raw_scores"][actions[1]]
-        second_log_odds = second["raw_scores"][actions[0]] - second["raw_scores"][actions[1]]
-        log_odds_errors.append(abs(first_log_odds - second_log_odds))
+        if len(actions) < 2 or set(actions) != set(second["raw_scores"]):
+            raise ValueError("live comparison requires matching action sets")
+        for left, right in itertools.combinations(actions, 2):
+            first_log_odds = first["raw_scores"][left] - first["raw_scores"][right]
+            second_log_odds = second["raw_scores"][left] - second["raw_scores"][right]
+            log_odds_errors.append(abs(first_log_odds - second_log_odds))
         if first["token_ids"] != second["token_ids"]:
             token_mismatches += 1
         for beta in (0.0, 0.15, 0.5, 1.0):
             first_corrected = bayesian_correct(first["raw_scores"], prior, target, beta)
             second_corrected = bayesian_correct(second["raw_scores"], prior, target, beta)
             probability_errors.extend(
-                abs(
-                    first_corrected.probabilities[action]
-                    - second_corrected.probabilities[action]
-                )
+                abs(first_corrected.probabilities[action] - second_corrected.probabilities[action])
                 for action in actions
             )
     threshold = THRESHOLDS[name]

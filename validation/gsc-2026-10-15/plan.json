@@ -1,0 +1,77 @@
+{
+  "study_id": "cal-agency-20261015",
+  "question": "Do vLLM API, native vLLM, and Transformers implement the same declared action-score correction?",
+  "model": "Qwen/Qwen3.5-4B",
+  "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "package_commit": "d697fc26d4852b183d4347b73668501fe464b1d0",
+  "source_working_changes": true,
+  "dtype": "bfloat16",
+  "execution": "eager, sequential per decision, no speculative decoding",
+  "gpu_memory_utilization": 0.35,
+  "context_limit": 4096,
+  "betas": [
+    0,
+    0.15,
+    0.5,
+    1
+  ],
+  "temperatures": [
+    0.7,
+    1
+  ],
+  "fixture_seed": 20260805,
+  "contexts_per_case": 8,
+  "native_contexts_per_case": 3,
+  "action_sets": [
+    "binary",
+    "multiclass"
+  ],
+  "thresholds": {
+    "api_native_log_odds": 0.001,
+    "api_native_probability": 0.0001,
+    "native_processor_probability": 1e-05,
+    "beta_zero_probability": 1e-07,
+    "transformers_diagnostic_log_odds": 0.05,
+    "transformers_diagnostic_probability": 0.01
+  },
+  "resource_limit": {
+    "array_tasks": 3,
+    "gpus_per_task": 1,
+    "maximum_minutes_per_task": 30,
+    "maximum_allocated_gpu_hours": 1.5,
+    "automatic_resubmissions": 0
+  },
+  "interpretation": "Implementation checks are required; cross-runtime and batching differences are retained diagnostics. This does not establish persona or behavioral validity.",
+  "source_sha256": {
+    "src/calibrated_agency/__init__.py": "9255dd9a672aca2e9dd9a751ede30651422969057f294a0e725e3ded5f2a01d9",
+    "src/calibrated_agency/backends/__init__.py": "f70b4968562a005cd884dbc5a81ab0aade9e8c8243e4b18a564ce1b86bf9fbcd",
+    "src/calibrated_agency/backends/base.py": "555d6f3daa5ad8873174030a8536626b9c9c9539a911a28b6350eeade6422d03",
+    "src/calibrated_agency/backends/tokenization.py": "b47bd24307f6e5c2b16ece2b1cbc7b3607be0ced69f5d6332fcbadcb0d53e964",
+    "src/calibrated_agency/backends/transformers_native.py": "6ab34bb56eee0924e00ba79901f8a6804f75d84f95a3b13bb1b6f5d3680c6f71",
+    "src/calibrated_agency/backends/vllm_api.py": "a0c7d2a70fc6aa59a95382bb9d92f775372c1fbbf7ed135972b199561f47a597",
+    "src/calibrated_agency/backends/vllm_native.py": "0701d5c6336e3b94e2463806c6e0d8b9a318b4d3b602a5a43b368db28a9b4629",
+    "src/calibrated_agency/conformance.py": "781d63d24472d46997d6a0db23ff3e726bf5c21ed1e7454fcd318621704e8635",
+    "src/calibrated_agency/correction.py": "75bc2fd0a74c974f2af7f2d1332de5203863b8c7f555153da5a335826779018c",
+    "src/calibrated_agency/fingerprint.py": "2232c2d187dc911d02b6dddfd43376bf9beb5dd4ec8ee4df621ae56f4b73b3c5",
+    "src/calibrated_agency/priors.py": "78667b779208ffd987ba61b8bd2e9abbcca09661896d8e4993cd346de1b0fff1",
+    "src/calibrated_agency/schemas.py": "8508d5e155d6e2387cb7173eb8c00d42229fa8eb5ba46156f2bc8de65bc4d79e",
+    "scripts/check_project_alignment.py": "c436f6b27833bb451117d7d298cda2b387cffdcf0fb2d4ad5c08a13a86143d12",
+    "scripts/compare_live.py": "5d0c8035977939e325ab8bebfa918757c55d55893efdc29019629d394d9a475f",
+    "scripts/live_backend.py": "019f3ece9e2e5f10c573779109a9bd197e4f7b53c6cd1e854720053bbf027528",
+    "scripts/validation_study/__init__.py": "9f5b299167c533318ef084ec7aa9c9c538c0a363c46a874598970f2ee8ef5b8a",
+    "scripts/validation_study/common.py": "519b19eb74d67279618e6326d6206146c5a1fe2b9221b9bec2e25e0feeeba408",
+    "scripts/validation_study/job.py": "109cb81fa5761ed3010f1845ed1b237fd87d00e270032c7355eb6883c169335f",
+    "scripts/validation_study/monitor.py": "94706c5716c80331eb6b5b62c0bcf613fb714701cde7760383bb6852827ccc2b",
+    "scripts/validation_study/preflight.py": "09376d9e3694be004748c0246c5c21e0b4b32f556f5fb4632f111caf1971b788",
+    "scripts/validation_study/remote_status.py": "a7b70a22be3c3b464721a7e1f8d00c233fa1de0716c3863afcc972d0fca8ae14",
+    "scripts/validation_study/worker.py": "f039947eb51e69b5964229709cf77b43ac2004b7af7da64e773e7f14b18d9154"
+  },
+  "environment": {
+    "vllm": "0.26.0",
+    "transformers": "5.14.1",
+    "torch": "2.11.0+cu130",
+    "gpu": "NVIDIA H200",
+    "vllm_enforce_eager": true,
+    "transformers_attention": "sdpa (confirmed in diagnostic record)"
+  }
+}

@@ -1,0 +1,1178 @@
+{
+  "mode": "api",
+  "model": "Qwen/Qwen3.5-4B",
+  "python": "3.12.13",
+  "packages": {
+    "calibrated-agency": "0.2.0a1",
+    "vllm": "0.26.0",
+    "transformers": "5.14.1",
+    "torch": "2.11.0+cu130"
+  },
+  "score_mode": "raw_logprobs",
+  "contexts": [
+    "A new topic has not been discussed yet and you have a distinct argument to introduce.",
+    "Another participant directly asked you a specific question in an existing discussion.",
+    "The feed contains a broad announcement and no comment is directed at you.",
+    "A participant made a factual claim you can correct with a short reply.",
+    "Several discussions repeat familiar points, while you have a new question for everyone.",
+    "An existing thread contains a nuanced argument that merits a direct response.",
+    "The feed is quiet and you have a self-contained observation to share.",
+    "A reply to your earlier message asks for clarification."
+  ],
+  "scores": [
+    {
+      "context_id": 0,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "A new topic has not been discussed yet and you have a distinct argument to introduce."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260805
+      },
+      "raw_scores": {
+        "post": -0.009346420876681805,
+        "comment": -5.6343464851379395
+      },
+      "probabilities": {
+        "post": 0.9964063976486794,
+        "comment": 0.0035936023513205434
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "post",
+      "metadata": {
+        "backend": "vllm_api",
+        "model": "Qwen/Qwen3.5-4B",
+        "declared_logprobs_mode": "raw_logprobs",
+        "latency_seconds": 1.4201367385685444,
+        "selected_action_semantics": "uncorrected_server_sample_ignored_by_decide",
+        "token_resolution": "bare_label_exact_roundtrip_v1",
+        "prompt_token_ids": [
+          248045,
+          8678,
+          198,
+          23298,
+          799,
+          11509,
+          1852,
+          13,
+          8984,
+          799,
+          314,
+          1439,
+          4581,
+          11535,
+          5975,
+          25,
+          361,
+          1265,
+          29,
+          2134,
+          510,
+          1265,
+          7813,
+          361,
+          1265,
+          29,
+          5989,
+          510,
+          1265,
+          13867,
+          248046,
+          198,
+          248045,
+          846,
+          198,
+          32,
+          491,
+          8282,
+          682,
+          524,
+          978,
+          13675,
+          3482,
+          321,
+          488,
+          599,
+          264,
+          12103,
+          5515,
+          310,
+          18553,
+          13,
+          248046,
+          198,
+          248045,
+          74455,
+          198,
+          248068,
+          271,
+          248069,
+          271,
+          27,
+          1265,
+          29
+        ]
+      }
+    },
+    {
+      "context_id": 1,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "Another participant directly asked you a specific question in an existing discussion."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260806
+      },
+      "raw_scores": {
+        "post": -1.6291804313659668,
+        "comment": -0.2541804015636444
+      },
+      "probabilities": {
+        "post": 0.2018132174596823,
+        "comment": 0.7981867825403176
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "comment",
+      "metadata": {
+        "backend": "vllm_api",
+        "model": "Qwen/Qwen3.5-4B",
+        "declared_logprobs_mode": "raw_logprobs",
+        "latency_seconds": 0.20849335379898548,
+        "selected_action_semantics": "uncorrected_server_sample_ignored_by_decide",
+        "token_resolution": "bare_label_exact_roundtrip_v1",
+        "prompt_token_ids": [
+          248045,
+          8678,
+          198,
+          23298,
+          799,
+          11509,
+          1852,
+          13,
+          8984,
+          799,
+          314,
+          1439,
+          4581,
+          11535,
+          5975,
+          25,
+          361,
+          1265,
+          29,
+          2134,
+          510,
+          1265,
+          7813,
+          361,
+          1265,
+          29,
+          5989,
+          510,
+          1265,
+          13867,
+          248046,
+          198,
+          248045,
+          846,
+          198,
+          13634,
+          24091,
+          5774,
+          4439,
+          488,
+          264,
+          3050,
+          3296,
+          303,
+          449,
+          6149,
+          9915,
+          13,
+          248046,
+          198,
+          248045,
+          74455,
+          198,
+          248068,
+          271,
+          248069,
+          271,
+          27,
+          1265,
+          29
+        ]
+      }
+    },
+    {
+      "context_id": 2,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "The feed contains a broad announcement and no comment is directed at you."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260807
+      },
+      "raw_scores": {
+        "post": -0.2553313374519348,
+        "comment": -1.50533127784729
+      },
+      "probabilities": {
+        "post": 0.7772998508568416,
+        "comment": 0.22270014914315833
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "comment",
+      "metadata": {
+        "backend": "vllm_api",
+        "model": "Qwen/Qwen3.5-4B",
+        "declared_logprobs_mode": "raw_logprobs",
+        "latency_seconds": 0.05556833557784557,
+        "selected_action_semantics": "uncorrected_server_sample_ignored_by_decide",
+        "token_resolution": "bare_label_exact_roundtrip_v1",
+        "prompt_token_ids": [
+          248045,
+          8678,
+          198,
+          23298,
+          799,
+          11509,
+          1852,
+          13,
+          8984,
+          799,
+          314,
+          1439,
+          4581,
+          11535,
+          5975,
+          25,
+          361,
+          1265,
+          29,
+          2134,
+          510,
+          1265,
+          7813,
+          361,
+          1265,
+          29,
+          5989,
+          510,
+          1265,
+          13867,
+          248046,
+          198,
+          248045,
+          846,
+          198,
+          760,
+          5227,
+          5435,
+          264,
+          6979,
+          16543,
+          321,
+          874,
+          3847,
+          369,
+          15083,
+          506,
+          488,
+          13,
+          248046,
+          198,
+          248045,
+          74455,
+          198,
+          248068,
+          271,
+          248069,
+          271,
+          27,
+          1265,
+          29
+        ]
+      }
+    },
+    {
+      "context_id": 3,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "A participant made a factual claim you can correct with a short reply."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260808
+      },
+      "raw_scores": {
+        "post": -2.244682788848877,
+        "comment": -0.11968275159597397
+      },
+      "probabilities": {
+        "post": 0.10669059039516234,
+        "comment": 0.8933094096048377
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "comment",
+      "metadata": {
+        "backend": "vllm_api",
+        "model": "Qwen/Qwen3.5-4B",
+        "declared_logprobs_mode": "raw_logprobs",
+        "latency_seconds": 0.05619702488183975,
+        "selected_action_semantics": "uncorrected_server_sample_ignored_by_decide",
+        "token_resolution": "bare_label_exact_roundtrip_v1",
+        "prompt_token_ids": [
+          248045,
+          8678,
+          198,
+          23298,
+          799,
+          11509,
+          1852,
+          13,
+          8984,
+          799,
+          314,
+          1439,
+          4581,
+          11535,
+          5975,
+          25,
+          361,
+          1265,
+          29,
+          2134,
+          510,
+          1265,
+          7813,
+          361,
+          1265,
+          29,
+          5989,
+          510,
+          1265,
+          13867,
+          248046,
+          198,
+          248045,
+          846,
+          198,
+          32,
+          24091,
+          1801,
+          264,
+          57879,
+          3591,
+          488,
+          628,
+          4252,
+          440,
+          264,
+          2716,
+          9559,
+          13,
+          248046,
+          198,
+          248045,
+          74455,
+          198,
+          248068,
+          271,
+          248069,
+          271,
+          27,
+          1265,
+          29
+        ]
+      }
+    },
+    {
+      "context_id": 4,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "Several discussions repeat familiar points, while you have a new question for everyone."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260809
+      },
+      "raw_scores": {
+        "post": -0.4320806860923767,
+        "comment": -1.0570807456970215
+      },
+      "probabilities": {
+        "post": 0.6513548782017746,
+        "comment": 0.3486451217982255
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "post",
+      "metadata": {
+        "backend": "vllm_api",
+        "model": "Qwen/Qwen3.5-4B",
+        "declared_logprobs_mode": "raw_logprobs",
+        "latency_seconds": 0.056332847103476524,
+        "selected_action_semantics": "uncorrected_server_sample_ignored_by_decide",
+        "token_resolution": "bare_label_exact_roundtrip_v1",
+        "prompt_token_ids": [
+          248045,
+          8678,
+          198,
+          23298,
+          799,
+          11509,
+          1852,
+          13,
+          8984,
+          799,
+          314,
+          1439,
+          4581,
+          11535,
+          5975,
+          25,
+          361,
+          1265,
+          29,
+          2134,
+          510,
+          1265,
+          7813,
+          361,
+          1265,
+          29,
+          5989,
+          510,
+          1265,
+          13867,
+          248046,
+          198,
+          248045,
+          846,
+          198,
+          33613,
+          19716,
+          12771,
+          10958,
+          3387,
+          11,
+          1345,
+          488,
+          599,
+          264,
+          491,
+          3296,
+          364,
+          4858,
+          13,
+          248046,
+          198,
+          248045,
+          74455,
+          198,
+          248068,
+          271,
+          248069,
+          271,
+          27,
+          1265,
+          29
+        ]
+      }
+    },
+    {
+      "context_id": 5,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "An existing thread contains a nuanced argument that merits a direct response."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260810
+      },
+      "raw_scores": {
+        "post": -0.9828357696533203,
+        "comment": -0.4828357994556427
+      },
+      "probabilities": {
+        "post": 0.3775406758018018,
+        "comment": 0.622459324198198
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "comment",
+      "metadata": {
+        "backend": "vllm_api",
+        "model": "Qwen/Qwen3.5-4B",
+        "declared_logprobs_mode": "raw_logprobs",
+        "latency_seconds": 0.0547776073217392,
+        "selected_action_semantics": "uncorrected_server_sample_ignored_by_decide",
+        "token_resolution": "bare_label_exact_roundtrip_v1",
+        "prompt_token_ids": [
+          248045,
+          8678,
+          198,
+          23298,
+          799,
+          11509,
+          1852,
+          13,
+          8984,
+          799,
+          314,
+          1439,
+          4581,
+          11535,
+          5975,
+          25,
+          361,
+          1265,
+          29,
+          2134,
+          510,
+          1265,
+          7813,
+          361,
+          1265,
+          29,
+          5989,
+          510,
+          1265,
+          13867,
+          248046,
+          198,
+          248045,
+          846,
+          198,
+          2014,
+          6149,
+          4368,
+          5435,
+          264,
+          78971,
+          5515,
+          421,
+          48156,
+          264,
+          2050,
+          1965,
+          13,
+          248046,
+          198,
+          248045,
+          74455,
+          198,
+          248068,
+          271,
+          248069,
+          271,
+          27,
+          1265,
+          29
+        ]
+      }
+    },
+    {
+      "context_id": 6,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "The feed is quiet and you have a self-contained observation to share."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260811
+      },
+      "raw_scores": {
+        "post": -0.20246002078056335,
+        "comment": -1.7024600505828857
+      },
+      "probabilities": {
+        "post": 0.8175744806385543,
+        "comment": 0.18242551936144571
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "post",
+      "metadata": {
+        "backend": "vllm_api",
+        "model": "Qwen/Qwen3.5-4B",
+        "declared_logprobs_mode": "raw_logprobs",
+        "latency_seconds": 0.053969452157616615,
+        "selected_action_semantics": "uncorrected_server_sample_ignored_by_decide",
+        "token_resolution": "bare_label_exact_roundtrip_v1",
+        "prompt_token_ids": [
+          248045,
+          8678,
+          198,
+          23298,
+          799,
+          11509,
+          1852,
+          13,
+          8984,
+          799,
+          314,
+          1439,
+          4581,
+          11535,
+          5975,
+          25,
+          361,
+          1265,
+          29,
+          2134,
+          510,
+          1265,
+          7813,
+          361,
+          1265,
+          29,
+          5989,
+          510,
+          1265,
+          13867,
+          248046,
+          198,
+          248045,
+          846,
+          198,
+          760,
+          5227,
+          369,
+          11012,
+          321,
+          488,
+          599,
+          264,
+          638,
+          91938,
+          21254,
+          310,
+          4191,
+          13,
+          248046,
+          198,
+          248045,
+          74455,
+          198,
+          248068,
+          271,
+          248069,
+          271,
+          27,
+          1265,
+          29
+        ]
+      }
+    },
+    {
+      "context_id": 7,
+      "request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "Choose one forum action. Output one of these exact XML actions: <action>post</action>, <action>comment</action>."
+          },
+          {
+            "role": "user",
+            "content": "A reply to your earlier message asks for clarification."
+          }
+        ],
+        "assistant_prefix": "<action>",
+        "actions": [
+          {
+            "action": "post",
+            "label": "post"
+          },
+          {
+            "action": "comment",
+            "label": "comment"
+          }
+        ],
+        "seed": 20260812
+      },
+      "raw_scores": {
+        "post": -2.387033700942993,
+        "comment": -0.1370335966348648
+      },
+      "probabilities": {
+        "post": 0.09534945590170514,
+        "comment": 0.9046505440982949
+      },
+      "token_ids": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "selected_action": "post",
+      "metadata": {
+        "backend": "vllm_api",
+        "model": "Qwen/Qwen3.5-4B",
+        "declared_logprobs_mode": "raw_logprobs",
+        "latency_seconds": 0.0546770878136158,
+        "selected_action_semantics": "uncorrected_server_sample_ignored_by_decide",
+        "token_resolution": "bare_label_exact_roundtrip_v1",
+        "prompt_token_ids": [
+          248045,
+          8678,
+          198,
+          23298,
+          799,
+          11509,
+          1852,
+          13,
+          8984,
+          799,
+          314,
+          1439,
+          4581,
+          11535,
+          5975,
+          25,
+          361,
+          1265,
+          29,
+          2134,
+          510,
+          1265,
+          7813,
+          361,
+          1265,
+          29,
+          5989,
+          510,
+          1265,
+          13867,
+          248046,
+          198,
+          248045,
+          846,
+          198,
+          32,
+          9559,
+          310,
+          678,
+          6575,
+          1876,
+          16561,
+          364,
+          61535,
+          13,
+          248046,
+          198,
+          248045,
+          74455,
+          198,
+          248068,
+          271,
+          248069,
+          271,
+          27,
+          1265,
+          29
+        ]
+      }
+    }
+  ],
+  "batch_scores": [],
+  "probability_mean_prior": {
+    "post": 0.5030036933630252,
+    "comment": 0.49699630663697475
+  },
+  "target": {
+    "post": 0.2,
+    "comment": 0.8
+  },
+  "core_corrections": [
+    {
+      "context_id": 0,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.36717703540950947,
+        "comment": 0.6328229645904906
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.8053694879187654,
+        "comment": 0.19463051208123455
+      }
+    },
+    {
+      "context_id": 0,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.9856094832673835,
+        "comment": 0.014390516732616467
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.16877323882259318,
+        "comment": 0.8312267611774068
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.11107553156976899,
+        "comment": 0.888924468430231
+      }
+    },
+    {
+      "context_id": 1,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.05878364802031494,
+        "comment": 0.941216351979685
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.2313691003008386,
+        "comment": 0.7686308996991614
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.31706305910976934,
+        "comment": 0.6829369408902305
+      }
+    },
+    {
+      "context_id": 2,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.46299047787144415,
+        "comment": 0.5370095221285558
+      }
+    },
+    {
+      "context_id": 3,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 3,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.153573173142979,
+        "comment": 0.8464268268570211
+      }
+    },
+    {
+      "context_id": 3,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.07908810838068636,
+        "comment": 0.9209118916193136
+      }
+    },
+    {
+      "context_id": 3,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.02865623709296116,
+        "comment": 0.9713437629070388
+      }
+    },
+    {
+      "context_id": 4,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 4,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.21511801407365244,
+        "comment": 0.7848819859263475
+      }
+    },
+    {
+      "context_id": 4,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.25354352783833506,
+        "comment": 0.7464564721616649
+      }
+    },
+    {
+      "context_id": 4,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.3157636907634117,
+        "comment": 0.6842363092365883
+      }
+    },
+    {
+      "context_id": 5,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 5,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.18799416601277313,
+        "comment": 0.8120058339872268
+      }
+    },
+    {
+      "context_id": 5,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.16215209885538717,
+        "comment": 0.8378479011446129
+      }
+    },
+    {
+      "context_id": 5,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.1302999536694345,
+        "comment": 0.8697000463305655
+      }
+    },
+    {
+      "context_id": 6,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 6,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.23810507323860275,
+        "comment": 0.7618949267613973
+      }
+    },
+    {
+      "context_id": 6,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.3447263986903006,
+        "comment": 0.6552736013096995
+      }
+    },
+    {
+      "context_id": 6,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.5254008022853991,
+        "comment": 0.47459919771460096
+      }
+    },
+    {
+      "context_id": 7,
+      "beta": 0.0,
+      "probabilities": {
+        "post": 0.2,
+        "comment": 0.8
+      }
+    },
+    {
+      "context_id": 7,
+      "beta": 0.15,
+      "probabilities": {
+        "post": 0.15115168804366488,
+        "comment": 0.848848311956335
+      }
+    },
+    {
+      "context_id": 7,
+      "beta": 0.5,
+      "probabilities": {
+        "post": 0.0746541204368392,
+        "comment": 0.9253458795631608
+      }
+    },
+    {
+      "context_id": 7,
+      "beta": 1.0,
+      "probabilities": {
+        "post": 0.025374479683726994,
+        "comment": 0.974625520316273
+      }
+    }
+  ],
+  "native_decisions": []
+}

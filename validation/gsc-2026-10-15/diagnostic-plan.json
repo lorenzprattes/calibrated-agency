@@ -1,0 +1,20 @@
+{
+  "job_id": "5736889",
+  "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "maximum_gpu_minutes": 10,
+  "allocated_gpu_seconds": 173,
+  "state": "COMPLETED",
+  "exit_code": "0:0",
+  "source_sha256": {
+    "scripts/validation_study/diagnose.py": "1165ea40f08aa034439d4c8bd5e68681445a3f33fa6d7e52b97e3e611f379fe3"
+  },
+  "settings": {
+    "vllm_generation_config": "vllm",
+    "vllm_enable_prefix_caching": false,
+    "vllm_logprobs_mode": "processed_logits",
+    "vllm_enforce_eager": true,
+    "transformers_attention_baseline": "sdpa",
+    "dtype": "bfloat16"
+  },
+  "limitation": "Separate runtime implementations; no full-model float32 reference."
+}

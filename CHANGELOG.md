@@ -26,4 +26,9 @@
   fingerprints intentionally differ. This helper is not a DeSiRe cache-file implementation.
 - Add CPU source-level GABM/DeSiRe parity checks and verify isolated wheel installation.
 
-This is a local alpha build. Publication and fresh live-backend acceptance remain separate.
+- Add two-action and eleven-action H200 correctness benchmarks and controlled adapter/runtime
+  diagnostics. Record passing correction checks and unresolved cross-runtime/batching drift.
+- Handle completed Slurm arrays through accounting and keep due agent audits running when
+  a scheduler probe fails; retain focused regression checks.
+
+The alpha is available from GitHub. It is not published on PyPI.

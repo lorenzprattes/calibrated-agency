@@ -55,6 +55,7 @@ packages = ["src/calibrated_agency"]
 [tool.pytest.ini_options]
 addopts = "--strict-config --strict-markers"
 testpaths = ["tests"]
+pythonpath = ["."]
 markers = [
   "integration: requires an external model or vLLM endpoint",
   "gpu: requires a CUDA GPU",

@@ -1,0 +1,57 @@
+{
+  "passed": true,
+  "device": "cpu",
+  "cases": {
+    "binary": {
+      "tokens": {
+        "post": 2134,
+        "comment": 5989
+      },
+      "prompt_lengths": [
+        64,
+        60,
+        61,
+        61,
+        62,
+        60,
+        61,
+        57
+      ],
+      "contexts": 8
+    },
+    "multiclass": {
+      "tokens": {
+        "post": 2134,
+        "reply": 20390,
+        "react": 2840,
+        "unreact": 13110,
+        "reshare": 18781,
+        "follow": 18000,
+        "unfollow": 87311,
+        "join_community": 5799,
+        "leave_community": 20852,
+        "do_nothing": 11158,
+        "stop": 9215
+      },
+      "prompt_lengths": [
+        127,
+        123,
+        124,
+        124,
+        125,
+        123,
+        124,
+        120
+      ],
+      "contexts": 8
+    }
+  },
+  "native_max_probability_error": 4.036412337704576e-08,
+  "chat_template_sha256": "12de9034d5269e8b1fe6012b3538374fcb3941bf93c95fc81b0cf5acf3f08ce4",
+  "versions": {
+    "torch": "2.11.0+cu130",
+    "transformers": "5.14.1",
+    "vllm": "0.26.0",
+    "calibrated-agency": "0.2.0a1"
+  }
+}
